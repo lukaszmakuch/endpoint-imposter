@@ -1,6 +1,4 @@
 const express = require('express');
-const app = express();
-const port = 3000;
 
 const mockConfig = {
 
@@ -44,25 +42,37 @@ const mockConfig = {
 
 };
 
-let machine = {
+const makeNewMachine = () => ({
   state: 'Initial',
   pendingContinuations: [],
-}
+});
 
-app.get('/continue-all', (req, res) => {
+let machines = [];
+
+const machineApp = express();
+
+machineApp.get('/continue-all', (req, res) => {
+  const { machine } = req;
+  const continuationKeyToTrigger = req.query.continuationKey;
+  let remainingPendingContinuations = [];
   for (let i = 0; i < machine.pendingContinuations.length; i++) {
-    machine.pendingContinuations[i].fn();
+    const pendingContinuation = machine.pendingContinuations[i];
+    if (pendingContinuation.continuationKey === continuationKeyToTrigger) {
+      pendingContinuation.fn();
+    } else {
+      remainingPendingContinuations.push(pendingContinuation);
+    }
   }
-  machine.pendingContinuations = [];
+  machine.pendingContinuations = remainingPendingContinuations;
   res.send('👍')
 });
 
-app.all('/*', (req, res) => {
-
+machineApp.all('/*', (req, res) => {
+  const { machine } = req;
   const firstMatchingRequest = mockConfig[machine.state].find(
     ({ requestMatcher }) => requestMatcher(req)
   );
-  if (!firstMatchingRequest) res.status(400).send('No matching mock. 😭');
+  if (!firstMatchingRequest) return res.status(400).send('No matching mock. 😭');
   const { continuationKey, responseGenerator } = firstMatchingRequest;
   const sendResponse = () => responseGenerator(req, res);
   if (continuationKey) {
@@ -78,5 +88,17 @@ app.all('/*', (req, res) => {
   const { newState } = firstMatchingRequest;
   if (newState) machine.state = newState;
 });
+
+const machineMiddleware = (req, res, next) => {
+  const sessionId = req.params.sessionId;
+  if (!machines[sessionId]) machines[sessionId] = makeNewMachine();
+  req.machine = machines[sessionId];
+  next();
+};
+
+const app = express();
+const port = 3000;
+
+app.use('/:sessionId', [machineMiddleware, machineApp]);
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
