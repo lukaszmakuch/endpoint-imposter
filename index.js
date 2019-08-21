@@ -37,12 +37,11 @@ const mockConfig = [
     state: 'SetTo2',
     requestMatcher: req => req.path === '/a' && req.method === 'GET',
     responseGenerator: (req, res) => res.send('2'),
-    continuationKey: 'go-a', // rename to "go"
+    continuationKey: 'go-a', // TODO: rename to "go"
   },
 ];
 
 const makeNewSession = () => ({
-  // state: 'init',
   statesOfMachines: {},
   pendingContinuations: [],
 });
@@ -70,7 +69,7 @@ machineApp.get('/continue-all', (req, res) => {
     }
   }
   session.pendingContinuations = remainingPendingContinuations;
-  res.send('👍')
+  res.send('👍');
 });
 
 machineApp.all('/*', (req, res) => {
