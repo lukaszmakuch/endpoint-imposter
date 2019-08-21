@@ -3,12 +3,16 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "bin": {
+    "http-mock": "./index.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "minimist": "^1.2.0"
   }
 }

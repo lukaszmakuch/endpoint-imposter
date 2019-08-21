@@ -1,45 +1,13 @@
+#!/usr/bin/env node
+const minimist = require('minimist');
 const express = require('express');
+const path = require('path');
 
-const mockConfig = [
-  {
-    machine: 'toggle',
-    state: 'init',
-    requestMatcher: req => req.path === '/binary',
-    responseGenerator: (req, res) => res.send('0'),
-    newState: 'toggled',
-  },
-  {
-    machine: 'toggle',
-    state: 'toggled',
-    requestMatcher: req => req.path === '/binary',
-    responseGenerator: (req, res) => res.send('1'),
-    newState: 'init',
-  },
-  {
-    machine: 'add-todo',
-    // mountPath: '/add_todo',
-    state: 'init',
-    requestMatcher: req => req.path === '/a' && req.method === 'GET',
-    responseGenerator: (req, res) => res.send('1'),
-    continuationKey: 'go-a',
-  },
-  {
-    machine: 'add-todo',
-    // mountPath: '/add_todo',
-    state: 'init',
-    requestMatcher: req => req.path === '/set2' && req.method === 'GET',
-    responseGenerator: (req, res) => res.send('set'),
-    newState: 'SetTo2'
-  },
-  {
-    machine: 'add-todo',
-    // mountPath: '/add_todo',
-    state: 'SetTo2',
-    requestMatcher: req => req.path === '/a' && req.method === 'GET',
-    responseGenerator: (req, res) => res.send('2'),
-    continuationKey: 'go-a', // TODO: rename to "go"
-  },
-];
+const argv = minimist(process.argv.slice(2));
+
+const mocksPath = path.resolve(argv.mocks);
+const port = argv.port;
+const mockConfig = require(mocksPath);
 
 const makeNewSession = () => ({
   statesOfMachines: {},
@@ -101,7 +69,6 @@ machineApp.all('/*', (req, res) => {
 });
 
 const app = express();
-const port = 3000;
 
 app.use('/:sessionId', [sessionMiddleware, machineApp]);
 
