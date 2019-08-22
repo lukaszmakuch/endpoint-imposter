@@ -38,7 +38,7 @@ machineApp.all('/*', (req, res) => {
   if (continuationKey) {
     const continuation = {
       continuationKey,
-      fn: sendResponse // TODO: remove fn to just sendResponse
+      fn: sendResponse // TODO: rename fn to just sendResponse
     };
     session.pendingContinuations.push(continuation);
   } else {

@@ -15,7 +15,7 @@ const watchMockConfig = (filename, cb) => {
   fs.watch(filename, {}, (eventType, filename) => {
     if (eventType === 'change') loadFresh();
   });
-}
+};
 
 module.exports = {
   watchMockConfig,
