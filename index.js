@@ -2,29 +2,55 @@
 const minimist = require('minimist');
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 
 const argv = minimist(process.argv.slice(2));
 
 const mocksPath = path.resolve(argv.mocks);
 const port = argv.port;
-const mockConfig = require(mocksPath);
+
+const watchMockConfig = (filename, cb) => {
+  const loadFresh = () => {
+    try {
+      delete require.cache[filename];
+      const config = require(filename);
+      cb(config);
+    } catch (e) {
+      console.error('Unable to load the mocks.');
+      console.error(e);
+    }
+  };
+  loadFresh();
+  fs.watch(mocksPath, {}, (eventType, filename) => {
+    if (eventType === 'change') loadFresh();
+  });
+}
+
+let mockConfig = [];
+watchMockConfig(mocksPath, config => mockConfig = config)
 
 const makeNewSession = () => ({
   statesOfMachines: {},
   pendingContinuations: [],
 });
 
-let sessions = [];
+let sessions;
+const clearAllSessions = () => sessions = [];
+clearAllSessions();
+const clearSession = sessionId => {
+  delete sessions[sessionId];
+};
 const sessionMiddleware = (req, res, next) => {
   const sessionId = req.params.sessionId;
   if (!sessions[sessionId]) sessions[sessionId] = makeNewSession();
+  req.clearSession = () => clearSession(sessionId);
   req.session = sessions[sessionId];
   next();
 };
 
 const machineApp = express();
 
-machineApp.get('/continue-all', (req, res) => {
+machineApp.get('/admin/continue-all', (req, res) => {
   const { session } = req;
   const continuationKeyToTrigger = req.query.continuationKey;
   let remainingPendingContinuations = [];
@@ -38,6 +64,17 @@ machineApp.get('/continue-all', (req, res) => {
   }
   session.pendingContinuations = remainingPendingContinuations;
   res.send('👍');
+});
+
+// That's not a machine specific thing - move it up
+// machineApp.get('/admin/clear-all', (req, res) => {
+//   clearAllSessions();
+//   res.send('🌊');
+// });
+
+machineApp.get('/admin/clear', (req, res) => {
+  req.clearSession();
+  res.send('🌊');
 });
 
 machineApp.all('/*', (req, res) => {
