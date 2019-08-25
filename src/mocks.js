@@ -64,6 +64,20 @@ const addErrorHandlingToRequestMatcher = requestMatcher => req => {
   }
 };
 
+const buildPatternbasedResponseGenerator = pattern => (req, res) => {
+  if (pattern.status) res.status(pattern.status);
+  if (pattern.headers) res.set(pattern.headers);
+  if (pattern.json) res.json(pattern.json);
+  if (pattern.body) res.send(pattern.body);
+  res.end();
+};
+
+const getOrBuildResponseGenerator = ({ responseGenerator, response }) => {
+  if (responseGenerator) return responseGenerator;
+  if (response)  return buildPatternbasedResponseGenerator(response);
+  return (req, res) => res.status(400).send('Missing response generator.'); // TODO: test this
+};
+
 // Reduces mocks like 
 // {requestPattern, requestMatcher, responseGenerator, response, ...}
 // to a unified format like {requestMatcher, responseGenerator, ...}
@@ -72,10 +86,12 @@ const unifyMockConfig = rawConfig => {
     const requestMatcher = addErrorHandlingToRequestMatcher(
       buildUnifiedRequestMatcher(rawRequestMock)
     );
+    const responseGenerator = getOrBuildResponseGenerator(rawRequestMock);
 
     return {
       ...rawRequestMock,
       requestMatcher,
+      responseGenerator,
     };
   });
 };
@@ -94,4 +110,5 @@ module.exports = {
   watchMockConfig,
   unifyMockConfig,
   mockMatches,
+  prepareRequestForMatching,
 };

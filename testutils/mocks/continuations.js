@@ -12,6 +12,13 @@ module.exports = [
   {
     machine: 'todos',
     state: 'gave_initial_todos',
+    requestPattern: { method: 'GET', path: '/gave_initial_todos' },
+    responseGenerator: (req, res) => res.send('ok'),
+  },
+
+  {
+    machine: 'todos',
+    state: 'gave_initial_todos',
     requestPattern: { method: 'GET', path: '/todos' },
     // TODO: test what happens when the response generator cannot generate a response.
     responseGenerator: (req, res) => res.send('🤔'),

@@ -35,11 +35,11 @@ const startServer = async (rawOptions) => {
       console.log(`stdout: ${data}`);
       resolve(serverProcess);
     });
-  });
 
-  serverProcess.stderr.on('data', (data) => {
-    console.error(`stderr: ${data}`);
-    resolve(serverProcess);
+    serverProcess.stderr.on('data', (data) => {
+      console.error(`stderr: ${data}`);
+      resolve(serverProcess);
+    });
   });
 
   // send the SIGTERM signal and wait for it to close
@@ -52,13 +52,12 @@ const startServer = async (rawOptions) => {
   }));
 
   const rawClient = axios.create({
-    baseURL: 'http://localhost:3000/'
+    baseURL: `http://localhost:${options['--port']}/`,
+    validateStatus: null,
   });
 
   let allResponsePromises = [];
-  let networkCallIndex = 0;
   const wrapNetworkCall = method => (...args) => {
-    let callId = networkCallIndex++;
     const responsePromise = method(...args);
     allResponsePromises.push(new Promise((resolve) => responsePromise.finally((err, res) => {
       resolve(res);
@@ -78,4 +77,14 @@ const startServer = async (rawOptions) => {
   return { serverProcess, close, client };
 };
 
-module.exports = { resolveMockFile, startServer }
+const withServer = async (options, cb) => {
+  const started = await startServer(options);
+  try {
+    await cb(started);
+  } finally {
+    await started.client.waitForAllResponses();
+    await started.close();
+  }
+};
+
+module.exports = { resolveMockFile, startServer, withServer };

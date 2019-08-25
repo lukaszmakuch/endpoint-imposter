@@ -5,7 +5,7 @@ const path = require('path');
 
 const { makeSessions, getTransitionCount, getMachineState, transition } = require('./sessions');
 const makeAdminApp = require('./admin');
-const { watchMockConfig, unifyMockConfig, mockMatches } = require('./mocks');
+const { watchMockConfig, unifyMockConfig, mockMatches, prepareRequestForMatching } = require('./mocks');
 
 const argv = minimist(process.argv.slice(2));
 
@@ -35,7 +35,11 @@ machineApp.all('/*', (req, res) => {
   const { sessionId } = req.params;
   const session = sessions.getSession(sessionId);
   const matchingMock = mockConfig.find(mockMatches(session, req));
-  if (!matchingMock) return res.status(400).send('No matching mock. 😭');
+  if (!matchingMock) {
+    console.warn('No matching mock found for the following request:', prepareRequestForMatching(req));
+    console.log('Session:', session);
+    return res.status(400).send('No matching mock. 😭');
+  }
   const { afterRequest, afterResponse } = transitionActions(session, matchingMock);
 
   const { continuationKey, responseGenerator } = matchingMock;
@@ -44,7 +48,7 @@ machineApp.all('/*', (req, res) => {
   if (continuationKey) {
     // This is a mock with a delayed response.
     const continuationFn = (teminate) => {
-      if (teminate) return res.status(400).send('This pending response has been terminated.');
+      if (teminate) return res.status(401).send('This pending response has been terminated.');
       try {
         afterResponse();
       } catch (e) {
