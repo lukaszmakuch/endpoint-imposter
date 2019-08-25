@@ -35,12 +35,11 @@ machineApp.use(express.json()) // for parsing application/json
 machineApp.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 
 machineApp.all('/*', (req, res) => {
-  const { sessionId } = req.params;
+  const { sessionId } = req;
   const session = sessions.getSession(sessionId);
   const matchingMock = mockConfig.find(mockMatches(session, req));
   if (!matchingMock) {
     console.warn('No matching mock found for the following request:', prepareRequestForMatching(req));
-    console.log('Session:', session);
     return res.status(400).send('No matching mock. 😭');
   }
   const { afterRequest, afterResponse } = transitionActions(session, matchingMock);
@@ -84,9 +83,14 @@ machineApp.all('/*', (req, res) => {
   }
 });
 
+const sessionIdMiddleware = (req, res, next) => {
+  req.sessionId = req.params.sessionId;
+  next();
+};
+
 const app = express();
 
 app.use('/admin', adminApp);
-app.use('/:sessionId', machineApp);
+app.use('/:sessionId', [sessionIdMiddleware, machineApp]);
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`)); // TODO: that's funny 😅, change it.

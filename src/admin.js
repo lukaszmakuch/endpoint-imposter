@@ -17,10 +17,9 @@ module.exports = ({ sessions }) => {
     }
 */
   app.get('/continue', (req, res) => {
-    const { sessionId } = req.params;
+    const sessionId = req.query.session;
     const session = sessions.getSession(sessionId);
     const continuationKeyToTrigger = req.query.continuationKey;
-
     let remainingPendingContinuations = [];
     let someFailed = false;
     let anyContinued = false;
@@ -31,6 +30,7 @@ module.exports = ({ sessions }) => {
           pendingContinuation.continuationFn();
           anyContinued = true;
         } catch (e) { // TODO: log this, maybe, if not duplicated
+          console.warn(e);
           someFailed = true;
         }
       } else {
@@ -39,8 +39,10 @@ module.exports = ({ sessions }) => {
     }
     session.continuations = remainingPendingContinuations;
     if (someFailed) {
+      console.warn('Some continuations failed. 👎', )
       res.status(400).send('Some continuations failed. 👎');
     } else if (!anyContinued) {
+      console.warn('No continuation run. 👎')
       res.status(400).send('No continuation run. 👎');
     } else {
       res.send('All continuations have been resolved. 👍');
