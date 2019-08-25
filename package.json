@@ -7,12 +7,19 @@
     "http-mock": "./src/index.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --runInBand"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
     "express": "^4.17.1",
-    "minimist": "^1.2.0"
+    "minimist": "^1.2.0",
+    "sift": "^8.5.0"
+  },
+  "devDependencies": {
+    "axios": "^0.19.0",
+    "jest": "^24.9.0",
+    "tmp": "^0.1.0",
+    "wait-for-expect": "^2.0.0"
   }
 }

@@ -1,29 +1,45 @@
-const makeNewSession = () => ({
-  statesOfMachines: {},
-  pendingContinuations: [],
+const emptySessionData = () => ({
+  states: {},
+  transitionCounters: {},
+  continuations: [],
 });
 
-const makeEmptySessions = () => [];
+const INITIAL_STATE = 'init';
 
-module.exports = () => {
+const getMachineState = (session, machine) => session.states[machine] || INITIAL_STATE;
 
-  let sessions = makeEmptySessions();
+const getTransitionCount = (session, machine) => session.transitionCounters[machine] || 0;
+
+const emptySessions = () => [];
+
+const makeSessions = () => {
+
+  let sessions = emptySessions();
   const clearAllSessions = () => {
-    sessions = makeEmptySessions();
+    sessions = emptySessions();
   };
 
   const clearSession = sessionId => {
     delete sessions[sessionId];
   };
 
+  const sessionExists = sessionId => !!sessions[sessionId];
+
   const getSession = sessionId => {
-    if (!sessions[sessionId]) sessions[sessionId] = makeNewSession();
+    if (!sessionExists(sessionId)) sessions[sessionId] = emptySessionData();
     return sessions[sessionId];
   }
 
   return {
+    sessionExists,
     getSession,
     clearSession,
     clearAllSessions,
   };
+};
+
+module.exports = {
+  makeSessions,
+  getTransitionCount,
+  getMachineState,
 };
