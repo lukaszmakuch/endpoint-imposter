@@ -23,6 +23,7 @@ const prepareRequestForMatching = req => ({
   path: req.path,
   method: req.method,
   query: req.query,
+  headers: req.headers,
 });
 
 // TODO: a test for that

@@ -1,12 +1,5 @@
 const { withServer, resolveMockFile } = require('../testutils/server');
 
-it('blahs1', () => withServer({
-  '--mocks': resolveMockFile('continuations.js'),
-  '--port': 3000,
-}, async ({ client }) => {
-  expect(1).toBe(1);
-}));
-
 it('allows to use express response objects', () => withServer({
   '--mocks': resolveMockFile('responses.js'),
   '--port': 3000,
