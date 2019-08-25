@@ -24,6 +24,7 @@ const prepareRequestForMatching = req => ({
   method: req.method,
   query: req.query,
   headers: req.headers,
+  body: req.body,
 });
 
 // TODO: a test for that

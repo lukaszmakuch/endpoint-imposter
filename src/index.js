@@ -31,6 +31,9 @@ const transitionActions = (session, mock) => {
   return { afterRequest, afterResponse };
 }
 
+machineApp.use(express.json()) // for parsing application/json
+machineApp.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
+
 machineApp.all('/*', (req, res) => {
   const { sessionId } = req.params;
   const session = sessions.getSession(sessionId);

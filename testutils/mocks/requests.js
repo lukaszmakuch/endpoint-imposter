@@ -31,6 +31,17 @@ module.exports = [
       'query.b': { $in: ['y', 'z'] },
     },
     response: { status: 200 },
-  }
+  },
+
+  {
+    requestPattern: {
+      path: '/body-pattern',
+      body: {
+        a: 'x',
+        b: 'y',
+      }
+    },
+    response: { status: 200 },
+  },
 
 ];

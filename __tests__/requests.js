@@ -1,4 +1,5 @@
 const { withServer, resolveMockFile } = require('../testutils/server');
+const querystring = require('querystring');
 
 it('allows to match express request objects with a custom function', () => withServer({
   '--mocks': resolveMockFile('requests.js'),
@@ -55,4 +56,14 @@ it('supports query patterns', () => withServer({
   expect((await client.get('/s/query-pattern?a=x&b=y&c=z')).status).toEqual(200);
   expect((await client.get('/s/query-pattern?a=y&b=z')).status).not.toEqual(200);
   expect((await client.get('/s/query-pattern?a=x')).status).not.toEqual(200);
+}));
+
+it('supports body patterns', () => withServer({
+  '--mocks': resolveMockFile('requests.js'),
+  '--port': 3000,
+}, async ({ client }) => {
+  expect((await client.post('/s/body-pattern', {a: 'x', b: 'y'})).status).toEqual(200);
+  expect((await client.post('/s/body-pattern', {a: 'x', b: 'z'})).status).not.toEqual(200);
+  expect((await client.post('/s/body-pattern', querystring.stringify({a: 'x', b: 'y'}))).status).toEqual(200);
+  expect((await client.post('/s/body-pattern', querystring.stringify({a: 'x', b: 'z'}))).status).not.toEqual(200);
 }));
