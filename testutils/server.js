@@ -60,9 +60,7 @@ const startServer = async (rawOptions) => {
   const wrapNetworkCall = method => (...args) => {
     let callId = networkCallIndex++;
     const responsePromise = method(...args);
-    console.log('(' + callId + ') started a network call', args)
     allResponsePromises.push(new Promise((resolve) => responsePromise.finally((err, res) => {
-      console.log('(' + callId + ') the network call to', args, 'gave', err, res)
       resolve(res);
     })));
     return responsePromise;

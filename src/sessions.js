@@ -38,8 +38,20 @@ const makeSessions = () => {
   };
 };
 
+const transition = (session, machine, transitionCountWhenScheduled, nextState) => {
+  const currentTransitionCount = getTransitionCount(session, machine);
+  if (transitionCountWhenScheduled === currentTransitionCount) {
+    session.transitionCounters[machine] = getTransitionCount(session, machine) + 1;
+    session.states[machine] = nextState;
+  } else {
+    const oldState = getMachineState(session, machine);
+    throw new Error(`Unable to perform a transition from ${oldState} to ${nextState} in ${machine}, because another transition has already been performed.`);
+  }
+};
+
 module.exports = {
   makeSessions,
   getTransitionCount,
   getMachineState,
+  transition,
 };

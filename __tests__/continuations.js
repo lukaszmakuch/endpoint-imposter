@@ -76,9 +76,9 @@ it('allows to control when a response is sent', async () => {
     client.get('/my-session/todos')
       .then((res) => events.push(['After added:', res.data]));
 
-    waitForExpect(async () => expect(
+    await waitForExpect(async () => expect(
       (await client.get('/admin/continue?session=my-session&continuationKey=give_new_todos')).status
-    ).toBeTruthy());
+    ).toEqual(200));
 
     await waitForExpect(() => expect(events).toEqual([
       'About to fetch todos.',

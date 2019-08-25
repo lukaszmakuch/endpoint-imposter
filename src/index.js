@@ -3,7 +3,7 @@ const minimist = require('minimist');
 const express = require('express');
 const path = require('path');
 
-const { makeSessions, getTransitionCount, getMachineState } = require('./sessions');
+const { makeSessions, getTransitionCount, getMachineState, transition } = require('./sessions');
 const makeAdminApp = require('./admin');
 const { watchMockConfig, unifyMockConfig, mockMatches } = require('./mocks');
 
@@ -20,20 +20,6 @@ const adminApp = makeAdminApp({ sessions })
 
 const machineApp = express();
 
-// TODO: extract it to sessions.js
-const transition = (session, machine, transitionCountWhenScheduled, nextState) => {
-  const currentTransitionCount = getTransitionCount(session, machine);
-  if (transitionCountWhenScheduled === currentTransitionCount) {
-    // possible to transition
-    session.transitionCounters[machine] = getTransitionCount(session, machine) + 1;
-    console.log(`Transitione from ${session.states[machine]} to ${nextState}.`);
-    session.states[machine] = nextState;
-  } else {
-    const oldState = getMachineState(session, machine);
-    throw new Error(`Unable to perform a transition from ${oldState} to ${nextState} in ${machine}, because another transition has already been performed.`);
-  }
-}
-
 const transitionActions = (session, mock) => {
   const transitionCountWhenScheduled = getTransitionCount(session, mock.machine);
   const afterRequest = () => {
@@ -46,7 +32,6 @@ const transitionActions = (session, mock) => {
 }
 
 machineApp.all('/*', (req, res) => {
-  console.log(`requesting ${req.path}`);
   const { sessionId } = req.params;
   const session = sessions.getSession(sessionId);
   const matchingMock = mockConfig.find(mockMatches(session, req));
@@ -57,7 +42,6 @@ machineApp.all('/*', (req, res) => {
   const sendResponse = () => responseGenerator(req, res);
 
   if (continuationKey) {
-    console.log('getting ready to handle a delayed response with key: ' + continuationKey);
     // This is a mock with a delayed response.
     const continuationFn = (teminate) => {
       if (teminate) return res.status(400).send('This pending response has been terminated.');

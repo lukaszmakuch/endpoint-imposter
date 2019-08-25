@@ -20,12 +20,10 @@ module.exports = ({ sessions }) => {
     const { sessionId } = req.params;
     const session = sessions.getSession(sessionId);
     const continuationKeyToTrigger = req.query.continuationKey;
-    console.log(`continuation request ${session}:${continuationKeyToTrigger}`)
 
     let remainingPendingContinuations = [];
     let someFailed = false;
     let anyContinued = false;
-    console.log('continuations: ', session.continuations);
     for (let i = 0; i < session.continuations.length; i++) {
       const pendingContinuation = session.continuations[i];
       if (pendingContinuation.continuationKey === continuationKeyToTrigger) {
@@ -33,7 +31,6 @@ module.exports = ({ sessions }) => {
           pendingContinuation.continuationFn();
           anyContinued = true;
         } catch (e) { // TODO: log this, maybe, if not duplicated
-          console.warn('Continuation failed', e);
           someFailed = true;
         }
       } else {
