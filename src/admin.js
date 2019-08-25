@@ -10,12 +10,6 @@ module.exports = ({ sessions }) => {
   //   res.send('🌊');
   // });
 
-/*
-   const continuation = {
-      continuationKey,
-      continuationFn,
-    }
-*/
   app.get('/continue', (req, res) => {
     const sessionId = req.query.session;
     const session = sessions.getSession(sessionId);
