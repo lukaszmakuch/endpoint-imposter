@@ -1,27 +1,24 @@
 const emptySessionData = () => ({
-  states: {},
+  steps: {},
   transitionCounters: {},
-  continuations: [],
+  pendingResponses: [],
 });
 
-const INITIAL_STATE = 'init';
+const INITIAL_STEP = 'start';
 
-const getMachineState = (session, machine) => session.states[machine] || INITIAL_STATE;
+const getScenarioStep = (session, scenario) => session.steps[scenario] || INITIAL_STEP;
 
-const getTransitionCount = (session, machine) => session.transitionCounters[machine] || 0;
+const getTransitionCount = (session, scenario) => session.transitionCounters[scenario] || 0;
 
 const emptySessions = () => [];
 
 const makeSessions = () => {
 
   let sessions = emptySessions();
-  const clearAllSessions = () => {
-    sessions = emptySessions();
-  };
 
-  const clearSession = sessionId => {
-    delete sessions[sessionId];
-  };
+  // const clearSession = sessionId => {
+  //   delete sessions[sessionId];
+  // };
 
   const sessionExists = sessionId => !!sessions[sessionId];
 
@@ -33,25 +30,23 @@ const makeSessions = () => {
   return {
     sessionExists,
     getSession,
-    clearSession,
-    clearAllSessions,
   };
 };
 
-const transition = (session, machine, transitionCountWhenScheduled, nextState) => {
-  const currentTransitionCount = getTransitionCount(session, machine);
+const transition = (session, scenario, transitionCountWhenScheduled, nextStep) => {
+  const currentTransitionCount = getTransitionCount(session, scenario);
   if (transitionCountWhenScheduled === currentTransitionCount) {
-    session.transitionCounters[machine] = getTransitionCount(session, machine) + 1;
-    session.states[machine] = nextState;
+    session.transitionCounters[scenario] = getTransitionCount(session, scenario) + 1;
+    session.steps[scenario] = nextStep;
   } else {
-    const oldState = getMachineState(session, machine);
-    throw new Error(`Unable to perform a transition from ${oldState} to ${nextState} in ${machine}, because another transition has already been performed.`);
+    const oldStep = getScenarioStep(session, scenario);
+    throw new Error(`Unable to perform a transition from ${oldStep} to ${nextStep} in ${scenario}, because another transition has already been performed.`);
   }
 };
 
 module.exports = {
   makeSessions,
   getTransitionCount,
-  getMachineState,
+  getScenarioStep,
   transition,
 };

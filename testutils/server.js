@@ -4,7 +4,7 @@ const axios = require('axios');
 const tmp = require('tmp');
 const fs = require('fs');
 
-const resolveMockFile = filename => path.resolve(__dirname, '../testutils/mocks', filename);
+const resolveMockFile = filename => path.resolve(__dirname, '../testUtils/mocks', filename);
 
 const startServer = async (rawOptions) => {
 
@@ -81,6 +81,8 @@ const withServer = async (options, cb) => {
   const started = await startServer(options);
   try {
     await cb(started);
+  } catch (e) {
+    console.warn(e);
   } finally {
     await started.client.waitForAllResponses();
     await started.close();

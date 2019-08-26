@@ -1,6 +1,6 @@
 const fs = require('fs');
 const sift = require('sift').default;
-const { getMachineState } = require('./sessions.js');
+const { getScenarioStep } = require('./sessions.js');
 
 const watchMockConfig = (filename, cb) => {
   const loadFresh = () => {
@@ -34,17 +34,17 @@ const buildPatternBasedRequestMatcher = pattern => {
 };
 
 const buildUnifiedRequestMatcher = rawRequestMock => {
-  if (rawRequestMock.requestPattern && rawRequestMock.requestMatcher) {
+  if (rawRequestMock.request && rawRequestMock.requestMatcher) {
     // Both a function and a pattern are provided.
     // TODO: a test for the priority and the fact of these matchers being combined.
     const patternBasedRequestMatcher = buildPatternBasedRequestMatcher(
-      rawRequestMock.requestPattern
+      rawRequestMock.request
     );
     return req => patternBasedRequestMatcher(req) && rawRequestMock.requestMatcher(req);
-  } else if (rawRequestMock.requestPattern && !rawRequestMock.requestMatcher) {
+  } else if (rawRequestMock.request && !rawRequestMock.requestMatcher) {
     // Just a pattern is provided.
-    return buildPatternBasedRequestMatcher(rawRequestMock.requestPattern);
-  } else if (!rawRequestMock.requestPattern && rawRequestMock.requestMatcher) {
+    return buildPatternBasedRequestMatcher(rawRequestMock.request);
+  } else if (!rawRequestMock.request && rawRequestMock.requestMatcher) {
     // Just a function is provided
     return rawRequestMock.requestMatcher;
   } else {
@@ -76,7 +76,7 @@ const buildPatternbasedResponseGenerator = pattern => (req, res) => {
 
 const getOrBuildResponseGenerator = ({ responseGenerator, response }) => {
   if (responseGenerator) return responseGenerator;
-  if (response)  return buildPatternbasedResponseGenerator(response);
+  if (response) return buildPatternbasedResponseGenerator(response);
   return (req, res) => res.status(400).send('Missing response generator.'); // TODO: test this
 };
 
@@ -99,10 +99,10 @@ const unifyMockConfig = rawConfig => {
 };
 
 const mockMatches = (session, req) => mock => {
-  if (mock.machine) {
-    const currentState = getMachineState(session, mock.machine);
-    const requiredState = mock.state;
-    if (currentState !== requiredState) return false;
+  if (mock.scenario) {
+    const currentStep = getScenarioStep(session, mock.scenario);
+    const requiredStep = mock.step;
+    if (currentStep !== requiredStep) return false;
   }
 
   return mock.requestMatcher(req);

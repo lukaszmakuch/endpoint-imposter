@@ -1,4 +1,4 @@
-const { withServer, resolveMockFile } = require('../testutils/server');
+const { withServer, resolveMockFile } = require('../testUtils/server');
 
 it('allows to use express response objects', () => withServer({
   '--mocks': resolveMockFile('responses.js'),

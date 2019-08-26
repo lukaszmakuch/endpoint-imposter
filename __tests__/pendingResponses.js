@@ -1,8 +1,8 @@
-const { withServer, resolveMockFile } = require('../testutils/server');
+const { withServer, resolveMockFile } = require('../testUtils/server');
 const waitForExpect = require('wait-for-expect');
 
 it('allows to control when a response is sent', () => withServer({
-  '--mocks': resolveMockFile('continuations.js'),
+  '--mocks': resolveMockFile('pendingResponses.js'),
   '--port': 3000,
 }, async ({ client }) => {
   let events = [];
@@ -26,7 +26,7 @@ it('allows to control when a response is sent', () => withServer({
   ]));
 
   await waitForExpect(async () => expect(
-    (await client.get('/admin/continue?session=my-session&continuationKey=give_initial_todos')).status
+    (await client.get('/admin/release?session=my-session&key=give_initial_todos')).status
   ).toEqual(200));
 
   await waitForExpect(() => expect(events).toEqual([
@@ -53,7 +53,7 @@ it('allows to control when a response is sent', () => withServer({
   ]));
 
   await waitForExpect(async () => expect(
-    (await client.get('/admin/continue?session=my-session&continuationKey=finish_adding')).status
+    (await client.get('/admin/release?session=my-session&key=finish_adding')).status
   ).toEqual(200));
 
   await waitForExpect(() => expect(events).toEqual([
@@ -70,7 +70,7 @@ it('allows to control when a response is sent', () => withServer({
     .then((res) => events.push(['After added:', res.data]));
 
   await waitForExpect(async () => expect(
-    (await client.get('/admin/continue?session=my-session&continuationKey=give_new_todos')).status
+    (await client.get('/admin/release?session=my-session&key=give_new_todos')).status
   ).toEqual(200));
 
   await waitForExpect(() => expect(events).toEqual([

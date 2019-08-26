@@ -4,42 +4,34 @@ module.exports = ({ sessions }) => {
 
   const app = express();
 
-  // app.get('/clear', (req, res) => {
-  //   const sessionId = req.query.sessionId;
-  //   sessions.clearSession(sessionId);
-  //   res.send('🌊');
-  // });
-
-  app.get('/continue', (req, res) => {
+  app.get('/release', (req, res) => {
     const sessionId = req.query.session;
     const session = sessions.getSession(sessionId);
-    const continuationKeyToTrigger = req.query.continuationKey;
-    let remainingPendingContinuations = [];
+    const keyToTrigger = req.query.key;
+    let remainingPendingResponses = [];
     let someFailed = false;
-    let anyContinued = false;
-    for (let i = 0; i < session.continuations.length; i++) {
-      const pendingContinuation = session.continuations[i];
-      if (pendingContinuation.continuationKey === continuationKeyToTrigger) {
+    let anyReleased = false;
+    for (let i = 0; i < session.pendingResponses.length; i++) {
+      const pendingResponse = session.pendingResponses[i];
+      if (pendingResponse.key === keyToTrigger) {
         try {
-          pendingContinuation.continuationFn();
-          anyContinued = true;
+          pendingResponse.fn();
+          anyReleased = true;
         } catch (e) { // TODO: log this, maybe, if not duplicated
           console.warn(e);
           someFailed = true;
         }
       } else {
-        remainingPendingContinuations.push(pendingContinuation);
+        remainingPendingResponses.push(pendingResponse);
       }
     }
-    session.continuations = remainingPendingContinuations;
+    session.pendingResponses = remainingPendingResponses;
     if (someFailed) {
-      console.warn('Some continuations failed. 👎', )
       res.status(400).send('Some continuations failed. 👎');
-    } else if (!anyContinued) {
-      console.warn('No continuation run. 👎')
-      res.status(400).send('No continuation run. 👎');
+    } else if (!anyReleased) {
+      res.status(400).send('No response has been released. 👎');
     } else {
-      res.send('All continuations have been resolved. 👍');
+      res.send('All responses have been released. 👍');
     }
 
   });

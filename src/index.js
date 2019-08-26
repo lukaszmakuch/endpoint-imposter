@@ -3,7 +3,7 @@ const minimist = require('minimist');
 const express = require('express');
 const path = require('path');
 
-const { makeSessions, getTransitionCount, getMachineState, transition } = require('./sessions');
+const { makeSessions, getTransitionCount, transition } = require('./sessions');
 const makeAdminApp = require('./admin');
 const { watchMockConfig, unifyMockConfig, mockMatches, prepareRequestForMatching } = require('./mocks');
 
@@ -21,18 +21,18 @@ const adminApp = makeAdminApp({ sessions })
 const machineApp = express();
 
 const transitionActions = (session, mock) => {
-  const transitionCountWhenScheduled = getTransitionCount(session, mock.machine);
+  const transitionCountWhenScheduled = getTransitionCount(session, mock.scenario);
   const afterRequest = () => {
-    if (mock.afterRequest) transition(session, mock.machine, transitionCountWhenScheduled, mock.afterRequest);
+    if (mock.afterRequest) transition(session, mock.scenario, transitionCountWhenScheduled, mock.afterRequest);
   };
   const afterResponse = () => {
-    if (mock.afterResponse) transition(session, mock.machine, transitionCountWhenScheduled, mock.afterResponse);
+    if (mock.afterResponse) transition(session, mock.scenario, transitionCountWhenScheduled, mock.afterResponse);
   };
   return { afterRequest, afterResponse };
 }
 
-machineApp.use(express.json()) // for parsing application/json
-machineApp.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
+machineApp.use(express.json());
+machineApp.use(express.urlencoded({ extended: true }));
 
 machineApp.all('/*', (req, res) => {
   const { sessionId } = req;
@@ -44,12 +44,12 @@ machineApp.all('/*', (req, res) => {
   }
   const { afterRequest, afterResponse } = transitionActions(session, matchingMock);
 
-  const { continuationKey, responseGenerator } = matchingMock;
+  const { releaseOn, responseGenerator } = matchingMock;
   const sendResponse = () => responseGenerator(req, res);
 
-  if (continuationKey) {
+  if (releaseOn) {
     // This is a mock with a delayed response.
-    const continuationFn = (teminate) => {
+    const responseFn = (teminate) => {
       if (teminate) return res.status(401).send('This pending response has been terminated.');
       try {
         afterResponse();
@@ -62,13 +62,10 @@ machineApp.all('/*', (req, res) => {
 
       sendResponse();
     };
-    const continuation = {
-      continuationKey,
-      continuationFn,
-    }
+    const pendingResponse = { key: releaseOn, fn: responseFn };
     try {
       afterRequest();
-      session.continuations.push(continuation);
+      session.pendingResponses.push(pendingResponse);
     } catch (e) { // TODO: consider logging this
       res.status(400).send('Unable to perform afterRequest. ' + e.message);
     }

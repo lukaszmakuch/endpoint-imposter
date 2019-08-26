@@ -1,4 +1,4 @@
-const { withServer, resolveMockFile } = require('../testutils/server');
+const { withServer, resolveMockFile } = require('../testUtils/server');
 const querystring = require('querystring');
 
 it('allows to match express request objects with a custom function', () => withServer({

@@ -1,4 +1,4 @@
-const { withServer, resolveMockFile } = require('../testutils/server');
+const { withServer, resolveMockFile } = require('../testUtils/server');
 const waitForExpect = require('wait-for-expect');
 
 it('runs multiple instances of the same machine', () => withServer({
@@ -27,7 +27,7 @@ it('runs multiple instances of the same machine', () => withServer({
   client.get('/b/change');
 
   await waitForExpect(async () => expect(
-    (await client.get('/admin/continue?session=a&continuationKey=change')).status
+    (await client.get('/admin/release?session=a&key=change')).status
   ).toEqual(200));
 
   client.get('/a/read')
@@ -50,7 +50,7 @@ it('runs multiple instances of the same machine', () => withServer({
   ]));
 
   await waitForExpect(async () => expect(
-    (await client.get('/admin/continue?session=b&continuationKey=change')).status
+    (await client.get('/admin/release?session=b&key=change')).status
   ).toEqual(200));
 
   client.get('/b/read')

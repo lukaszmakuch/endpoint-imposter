@@ -1,7 +1,7 @@
 module.exports = [
 
   {
-    requestPattern: { method: 'GET', path: '/express-res' },
+    request: { method: 'GET', path: '/express-res' },
     responseGenerator: (req, res) => 
       res.status(500)
       .set('X-Test-Header', req.query.number)
@@ -13,7 +13,7 @@ module.exports = [
   // TODO: what if no way of providing responses is provided?
 
   {
-    requestPattern: { method: 'GET', path: '/res-template-json' },
+    request: { method: 'GET', path: '/res-template-json' },
     response: {
       headers: { 'X-Test-Header': 456 },
       status: 404,
@@ -22,7 +22,7 @@ module.exports = [
   },
 
   {
-    requestPattern: { method: 'GET', path: '/res-template-body' },
+    request: { method: 'GET', path: '/res-template-body' },
     response: {
       headers: { 'X-Test-Header': 456 },
       status: 404,
@@ -31,28 +31,28 @@ module.exports = [
   },
 
   {
-    requestPattern: { method: 'GET', path: '/res-template-partial-just-json' },
+    request: { method: 'GET', path: '/res-template-partial-just-json' },
     response: {
       json: ['a', 'b'],
     }
   },
 
   {
-    requestPattern: { method: 'GET', path: '/res-template-partial-just-status' },
+    request: { method: 'GET', path: '/res-template-partial-just-status' },
     response: {
       status: 404,
     }
   },
 
   {
-    requestPattern: { method: 'GET', path: '/res-template-partial-just-headers' },
+    request: { method: 'GET', path: '/res-template-partial-just-headers' },
     response: {
       headers: { 'X-Test': 'ABC' },
     }
   },
 
   {
-    requestPattern: { method: 'GET', path: '/res-template-partial-just-body' },
+    request: { method: 'GET', path: '/res-template-partial-just-body' },
     response: {
       body: '💻'
     }

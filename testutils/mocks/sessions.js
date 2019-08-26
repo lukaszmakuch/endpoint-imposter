@@ -1,24 +1,24 @@
 module.exports = [
 
   {
-    machine: 'stateful',
-    state: 'init',
-    requestPattern: { path: '/read' },
+    scenario: 'stateful',
+    step: 'start',
+    request: { path: '/read' },
     response: { body: 'X' },
   },
 
   {
-    machine: 'stateful',
-    state: 'init',
-    requestPattern: { path: '/change' },
-    continuationKey: 'change',
-    afterResponse: 'changed'
+    scenario: 'stateful',
+    step: 'start',
+    afterResponse: 'changed',
+    request: { path: '/change' },
+    releaseOn: 'change',
   },
 
   {
-    machine: 'stateful',
-    state: 'changed',
-    requestPattern: { path: '/read' },
+    scenario: 'stateful',
+    step: 'changed',
+    request: { path: '/read' },
     response: { body: 'Y' },
   },
 

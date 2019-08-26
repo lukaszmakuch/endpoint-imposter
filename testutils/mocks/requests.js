@@ -6,17 +6,17 @@ module.exports = [
 
   {
     requestMatcher: req => req.method === 'POST',
-    requestPattern: { path: '/combined' },
+    request: { path: '/combined' },
     response: { status: 200 },
   },
 
   {
-    requestPattern: { path: '/path-pattern' },
+    request: { path: '/path-pattern' },
     response: { status: 200 },
   },
 
   {
-    requestPattern: {
+    request: {
       path: '/',
       'headers.test-a': 'a',
       'headers.test-b': 'b',
@@ -25,7 +25,7 @@ module.exports = [
   },
 
   {
-    requestPattern: {
+    request: {
       path: '/query-pattern',
       'query.a': 'x',
       'query.b': { $in: ['y', 'z'] },
@@ -34,7 +34,7 @@ module.exports = [
   },
 
   {
-    requestPattern: {
+    request: {
       path: '/body-pattern',
       body: {
         a: 'x',
