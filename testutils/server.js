@@ -81,11 +81,11 @@ const withServer = async (options, cb) => {
   const started = await startServer(options);
   try {
     await cb(started);
-  } catch (e) {
-    console.warn(e);
-  } finally {
     await started.client.waitForAllResponses();
     await started.close();
+  } catch (e) {
+    await started.close();
+    throw e;
   }
 };
 

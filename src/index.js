@@ -50,7 +50,7 @@ machineApp.all('/*', (req, res) => {
   if (releaseOn) {
     // This is a mock with a delayed response.
     const responseFn = (teminate) => {
-      if (teminate) return res.status(401).send('This pending response has been terminated.');
+      if (teminate) return res.status(400).send('This pending response has been terminated.');
       try {
         afterResponse();
       } catch (e) {

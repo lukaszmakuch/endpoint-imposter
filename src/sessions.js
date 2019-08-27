@@ -16,9 +16,9 @@ const makeSessions = () => {
 
   let sessions = emptySessions();
 
-  // const clearSession = sessionId => {
-  //   delete sessions[sessionId];
-  // };
+  const clearSession = sessionId => {
+    delete sessions[sessionId];
+  };
 
   const sessionExists = sessionId => !!sessions[sessionId];
 
@@ -30,6 +30,7 @@ const makeSessions = () => {
   return {
     sessionExists,
     getSession,
+    clearSession,
   };
 };
 
