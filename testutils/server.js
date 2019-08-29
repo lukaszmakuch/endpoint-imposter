@@ -11,8 +11,10 @@ const startServer = async (rawOptions) => {
   // copy the template mocks file to a temporary file
   const mocksFile = tmp.fileSync();
   let options;
+  let setMocksFile = () => {};
   if (rawOptions['--mocks']) {
-    fs.copyFileSync(rawOptions['--mocks'], mocksFile.name);
+    setMocksFile = filename => fs.copyFileSync(filename, mocksFile.name);
+    setMocksFile(rawOptions['--mocks']);
     options = { ...rawOptions, '--mocks': mocksFile.name };
   } else {
     options = rawOptions;
@@ -74,7 +76,7 @@ const startServer = async (rawOptions) => {
     waitForAllResponses,
   }
 
-  return { serverProcess, close, client };
+  return { serverProcess, close, client, setMocksFile };
 };
 
 const withServer = async (options, cb) => {

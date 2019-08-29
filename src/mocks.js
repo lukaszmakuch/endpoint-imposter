@@ -1,12 +1,12 @@
 const fs = require('fs');
 const sift = require('sift').default;
+const importFresh = require('import-fresh');
 const { getScenarioStep } = require('./sessions.js');
 
 const watchMockConfig = (filename, cb) => {
   const loadFresh = () => {
     try {
-      delete require.cache[filename];
-      const config = require(filename);
+      const config = importFresh(filename);
       cb(config);
     } catch (e) {
       console.error('Unable to load the mocks.');

@@ -9,10 +9,11 @@
   "scripts": {
     "test": "jest --runInBand"
   },
-  "author": "",
+  "author": "Łukasz Makuch",
   "license": "MIT",
   "dependencies": {
     "express": "^4.17.1",
+    "import-fresh": "^3.1.0",
     "minimist": "^1.2.0",
     "sift": "^8.5.0"
   },
