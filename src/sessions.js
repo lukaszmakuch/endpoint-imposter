@@ -25,10 +25,23 @@ const makeSessions = () => {
   const getSession = sessionId => {
     if (!sessionExists(sessionId)) sessions[sessionId] = emptySessionData();
     return sessions[sessionId];
-  }
+  };
+
+  const terminateSession = sessionId => {
+    if (!sessionExists(sessionId)) return 'not_found';
+
+    const session = getSession(sessionId);
+    session.pendingResponses.forEach(({ fn }) => fn(true)); 
+    clearSession(sessionId);
+    return 'terminated';
+  };
+
+  const terminateAllSessions = () => Object.keys(sessions).forEach(terminateSession);
 
   return {
     sessionExists,
+    terminateSession,
+    terminateAllSessions,
     getSession,
     clearSession,
   };

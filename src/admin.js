@@ -39,12 +39,13 @@ module.exports = ({ sessions }) => {
 
   app.get('/terminate', (req, res) => {
     const sessionId = req.query.session;
-    if (!sessions.sessionExists(sessionId)) return res.status(404).end();
-
-    const session = sessions.getSession(sessionId);
-    session.pendingResponses.forEach(({ fn }) => fn(true)); 
-    sessions.clearSession(sessionId);
-    res.status(200).send();   
+    const terminationResult = sessions.terminateSession(sessionId);
+    switch (terminationResult) {
+      case 'not_found':
+        return res.status(404).end();
+      case 'terminated':
+        return res.status(200).send();
+    }
   });
 
   return app;

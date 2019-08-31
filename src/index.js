@@ -12,11 +12,14 @@ const argv = minimist(process.argv.slice(2));
 const mocksPath = path.resolve(argv.mocks);
 const port = argv.port;
 
-let mockConfig;
-watchMockConfig(mocksPath, config => mockConfig = unifyMockConfig(config))
-
 const sessions = makeSessions();
-const adminApp = makeAdminApp({ sessions })
+const adminApp = makeAdminApp({ sessions });
+
+let mockConfig;
+watchMockConfig(mocksPath, config => {
+  sessions.terminateAllSessions();
+  mockConfig = unifyMockConfig(config);
+});
 
 const machineApp = express();
 
