@@ -15,4 +15,10 @@ module.exports = [
     response: { body: 'B' },
   },
 
+  {
+    // no prefix
+    request: { path: '/c' },
+    response: { body: 'C' },
+  },
+
 ];

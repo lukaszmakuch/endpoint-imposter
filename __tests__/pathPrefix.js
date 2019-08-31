@@ -12,8 +12,13 @@ it('allows to add prefix the path', () => withServer({
     expect(
       (await client.post('/s/pattern/a', { should: 'not match' })).data
     ).not.toEqual('A');
+
     expect(
       (await client.get('/s/matcher/b')).data
     ).toEqual('B');
+
+    expect(
+      (await client.get('/s/c')).data
+    ).toEqual('C');
   });
 }));

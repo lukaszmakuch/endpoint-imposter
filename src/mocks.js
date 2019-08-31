@@ -89,7 +89,7 @@ const unifyMockConfig = rawConfig => {
       buildUnifiedRequestMatcher(rawRequestMock)
     );
     const responseGenerator = getOrBuildResponseGenerator(rawRequestMock);
-    const pathPrefix = rawRequestMock.pathPrefix || '/';
+    const pathPrefix = rawRequestMock.pathPrefix || '';
 
     return {
       ...rawRequestMock,
