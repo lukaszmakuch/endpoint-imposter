@@ -22,7 +22,3 @@ it('allows to reload a file while the server is running', () => withServer({
     expect((await client.get('/s/stateful')).data).toEqual('the initial state');
   });
 }));
-
-// TODO:
-// - resetting state
-// - terminating pending requests
