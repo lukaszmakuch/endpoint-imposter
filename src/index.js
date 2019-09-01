@@ -50,6 +50,7 @@ const makeMockRouter = mockConfig => {
       const matchingMock = mocks.find(mockMatches(session, req));
       if (!matchingMock) {
         console.warn('No matching mock found for the following request:', prepareRequestForMatching(req));
+        console.warn('The current session:', session);
         return res.status(400).send('No matching mock. 😭');
       }
       const { afterRequest, afterResponse } = transitionActions(session, matchingMock);
@@ -92,7 +93,10 @@ const makeMockRouter = mockConfig => {
     return [prefix, subApp];
   });
 
-  subAppsToMount.forEach(([prefix, subApp]) => mockRouter.use('/' + prefix, subApp));
+  subAppsToMount
+    .sort(([prefixA], [prefixB]) => prefixB.length - prefixA.length)
+    .forEach(([prefix, subApp]) => mockRouter.use('/' + prefix, subApp));
+  
   return mockRouter;
 };
 

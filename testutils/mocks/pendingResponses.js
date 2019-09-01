@@ -43,4 +43,108 @@ module.exports = [
     releaseOn: 'give_new_todos',
   },
 
+  // releaseOne tests:
+  {
+    scenario: 'release-one',
+    pathPrefix: 'release-one',
+    step: 'start',
+    afterRequest: 'hit-first',
+    request: { path: '/releaseOne' },
+    response: { body: '🙂' },
+    releaseOn: 'releaseOne',
+  },
+  {
+    scenario: 'release-one',
+    pathPrefix: 'release-one',
+    step: 'hit-first',
+    request: { path: '/hit-first' },
+    response: { body: '🙂' },
+  },
+
+  {
+    scenario: 'release-one',
+    pathPrefix: 'release-one',
+    step: 'hit-first',
+    afterRequest: 'hit-second',
+    request: { path: '/releaseOne' },
+    response: { body: '🙂' },
+    releaseOn: 'releaseOne',
+  },
+  {
+    scenario: 'release-one',
+    pathPrefix: 'release-one',
+    step: 'hit-second',
+    request: { path: '/hit-second' },
+    response: { body: '🙂' },
+  },
+
+  {
+    scenario: 'release-one',
+    pathPrefix: 'release-one',
+    step: 'hit-second',
+    afterRequest: 'hit-third',
+    request: { path: '/releaseOne' },
+    response: { body: '🙂' },
+    releaseOn: 'releaseOne',
+  },
+  {
+    scenario: 'release-one',
+    pathPrefix: 'release-one',
+    step: 'hit-third',
+    request: { path: '/hit-third' },
+    response: { body: '🙂' },
+  },
+
+  // releaseOneRight tests:
+  {
+    scenario: 'release-right',
+    pathPrefix: 'release-right',
+    step: 'start',
+    afterRequest: 'hit-first',
+    request: { path: '/releaseOneRight' },
+    response: { body: '🙂' },
+    releaseOn: 'releaseRight',
+  },
+  {
+    scenario: 'release-right',
+    pathPrefix: 'release-right',
+    step: 'hit-first',
+    request: { path: '/hit-first' },
+    response: { body: '🙂' },
+  },
+
+  {
+    scenario: 'release-right',
+    pathPrefix: 'release-right',
+    step: 'hit-first',
+    afterRequest: 'hit-second',
+    request: { path: '/releaseOneRight' },
+    response: { body: '🙂' },
+    releaseOn: 'releaseRight',
+  },
+  {
+    scenario: 'release-right',
+    pathPrefix: 'release-right',
+    step: 'hit-second',
+    request: { path: '/hit-second' },
+    response: { body: '🙂' },
+  },
+
+  {
+    scenario: 'release-right',
+    pathPrefix: 'release-right',
+    step: 'hit-second',
+    afterRequest: 'hit-third',
+    request: { path: '/releaseOneRight' },
+    response: { body: '🙂' },
+    releaseOn: 'releaseRight',
+  },
+  {
+    scenario: 'release-right',
+    pathPrefix: 'release-right',
+    step: 'hit-third',
+    request: { path: '/hit-third' },
+    response: { body: '🙂' },
+  },
+
 ];
