@@ -1,0 +1,107 @@
+/*
+ * Author: Łukasz Makuch <kontakt@lukaszmakuch.pl> (http://lukaszmakuch.pl)
+ * License: MIT
+ * Version: 1.0.1
+ */
+
+ .space-overlay-top, .space-overlay-bottom, .space-overlay-left, .space-overlay-right {
+   position: relative;
+ }
+
+ .space-overlay-top > *:nth-child(1), .space-overlay-bottom > *:nth-child(1), .space-overlay-left > *:nth-child(1), .space-overlay-right > *:nth-child(1) {
+   position: absolute;  
+ }
+
+ .space-overlay-top > *:nth-child(1) {
+   bottom: 100%;
+   left: 0;
+ }
+
+ .space-overlay-bottom > *:nth-child(1) {
+   top: 100%;
+   left: 0;
+ }
+
+ .space-overlay-left > *:nth-child(1) {
+   top: 0;
+   right: 100%;
+ }
+
+ .space-overlay-right > *:nth-child(1) {
+   top: 0;
+   left: 100%;
+ }
+
+ .space-flex-row, .space-flex-col {
+   display: flex;
+   align-items: flex-start;  
+ }
+
+ .space-flex-row {
+   flex-direction: row;
+ }
+
+ .space-flex-col {
+   flex-direction: column;
+ }
+
+ .space-wrapping-row > * {
+   display: flex;
+   flex-wrap: wrap;
+ }
+ .space-wrapping-row > * {
+   margin-left: calc(-1 * var(--col-gap));
+   margin-top: calc(-1 * var(--row-gap));
+ }
+ .space-wrapping-row > * > * {
+   margin-left: var(--col-gap);
+   margin-top: var(--row-gap);
+ }
+
+ .space-col-separator {
+   min-width: var(--size);
+ }
+
+ .space-row-separator {
+   min-height: var(--size);
+ }
+
+ .space-grid-row, .space-grid-col {
+   gap: var(--gap);
+   display: grid;
+   align-items: start;
+   justify-content: start;
+ }
+
+ .space-grid-col {
+   grid-auto-flow: row;
+ }
+
+ .space-grid-row {
+   grid-auto-flow: column;
+ }
+
+ .space-center, .space-left, .space-right, .space-top, .space-bottom {
+   display: flex;
+ }
+
+ .space-center {
+   justify-content: center;
+   align-items: center;
+ }
+
+ .space-left {
+   justify-content: flex-start;
+ }
+
+ .space-right {
+   justify-content: flex-end;
+ }
+
+ .space-top {
+   align-items: flex-start;
+ }
+
+ .space-bottom {
+   align-items: flex-end;
+ }

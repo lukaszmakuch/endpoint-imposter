@@ -1,0 +1,17 @@
+body {
+  font-size: 1em;
+  color: #000;
+}
+
+.content img {
+  margin: 0;
+  max-width: 100%;
+}
+
+.content {
+  overflow: hidden;
+}
+
+body.no-literate .content pre > code {
+  background-color: #fff;
+}

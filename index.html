@@ -1,0 +1,180 @@
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Endpoint Imposter - declarative, stateful, fast, and reusable HTTP mocks.</title>
+    <meta name="description" content="A tool for mocking HTTP endpoints.">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="author" content="Łukasz Makuch">
+    <link href="https://fonts.googleapis.com/css?family=PT+Sans+Narrow:400,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="reset.css">
+    <link rel="stylesheet" type="text/css" href="the-little-spacer.css">
+    <style>
+      :root {
+        --text-color: #000;
+        --background-color: #fff;
+        --accent-color: #7900dd;
+      }
+      body {
+        font-size: 20px;
+        font-family: 'PT Sans Narrow', sans-serif;
+        display: flex;
+        justify-content: center;
+        background-color: var(--background-color);
+        color: var(--text-color);
+      }
+      @media screen and (max-width: 600px) {
+        body {
+          font-size: 15px;
+        }
+      }
+      .container {
+        width: 40em;
+        max-width: 90%;
+        padding: 1em 0;
+        min-height: 100vh;
+        justify-content: center;
+      }
+      .main-header {
+        font-size: 3em;
+        font-weight: bold;
+      }
+      .space-grid-row.sections {
+        --gap: 2em;
+        justify-content: stretch;
+        grid-auto-columns: 1fr;
+      }
+      .space-grid-col.sections {
+        --gap: 2em;
+      }
+      .space-grid-col.section {
+        --gap: 1em;
+        justify-items: center;
+        justify-content: center;
+      }
+      .space-grid-col.cover {
+        justify-content: center;
+        align-content: center;
+        --gap: 1em;
+        width: 100%;
+      }
+      .space-grid-col.header-container {
+        --gap: 1em;
+      }
+      .space-grid-row.action-btns {
+        --gap: 1em;
+        justify-content: center;
+        align-content: center;
+      }
+      .section-header {
+        font-weight: bold;
+        font-size: 1em;
+      }
+      .section-content {
+        line-height: 1.5em;
+        text-align: justify;
+      }
+      .space-grid-col.container {
+        --gap: 7em;
+      }
+      .action-btn {
+        text-decoration: none;
+        background-color: var(--background-color);
+        color: var(--accent-color);
+        padding: 1em;
+        display: inline-block;
+        border-radius: 0.5em;
+        font-weight: bold;
+        border: 0.2em solid var(--accent-color);
+      }
+      .action-btn:hover {
+        background-color: var(--accent-color);
+        color: var(--background-color);
+      }
+      .page-footer {
+        text-align: right;
+      }
+      a {
+        text-decoration: none;
+        color: var(--accent-color);
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container space-grid-col">
+      <div class="space-grid-col header-container">
+        <h1 class="main-header">Endpoint Imposter</h1>
+        <h2 class="slogan">Declarative, stateful, fast, and reusable HTTP mocks.</h2>
+      </div>
+
+      <div class="space-grid-col cover">
+        <div class="space-grid-row action-btns">
+          <a target="_blank" href="https://github.com/lukaszmakuch/endpoint-imposter" class="action-btn">Source code</a>
+          <a target="_blank" href="/doc.html" class="action-btn">Documentation</a>
+        </div>
+      </div>
+
+      <div class="space-grid-col sections">
+
+        <div class="space-grid-row sections">
+          <div class="space-grid-col section">
+            <span class="section-header">Declarative statefulness</span>
+            <p class="section-content">
+              Real endpoints don't always return the same result for the same request. With scenarios, you can model such behavior in a declarative manner.
+            </p>
+          </div>
+
+          <div class="space-grid-col section">
+            <span class="section-header">Control over when responses are sent back</span>
+            <p class="section-content">
+              No more brittle "delay 500ms"! The tests may tell the mocked sever when to finish a request the application started.
+            </p>
+          </div>
+        </div>
+
+        <div class="space-grid-row sections">
+          <div class="space-grid-col section">
+            <span class="section-header">Reusable test doubles</span>
+            <p class="section-content">
+             Test doubles are data that lives in JavaScript modules. You can reuse them like any other JavaScript module. You can transform them like any other data.
+            </p>
+          </div>
+
+          <div class="space-grid-col section">
+            <span class="section-header">Scalable mental model</span>
+            <p class="section-content">
+              The way you build mocks is the same regardless if you're testing just a small function or the whole application.
+            </p>
+          </div>
+
+        </div>
+
+        <div class="space-grid-col sections">
+
+          <div class="space-grid-row sections">
+
+            <div class="space-grid-col section">
+              <span class="section-header">Fast parallelism</span>
+              <p class="section-content">
+                No need to worry about the state leaking between tests. A suffix added the root URL gives you an instantaneous, isolated session.
+              </p>
+            </div>
+
+            <div class="space-grid-col section">
+              <span class="section-header">Platform agnostic</span>
+              <p class="section-content">
+               The mocks run as an independent HTTP server. Anything that works with HTTP will work with these mocks.
+              </p>
+            </div>
+
+          </div>
+
+      </div>
+      <footer class="page-footer"><a href="https://lukaszmakuch.pl">lukaszmakuch.pl</a></footer>
+    </div>
+  </body>
+</html>
