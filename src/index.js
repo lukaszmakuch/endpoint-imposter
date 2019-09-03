@@ -117,4 +117,4 @@ const app = express();
 app.use('/admin', adminApp);
 app.use('/:sessionId', [sessionIdMiddleware, (...args) => mockRouter(...args)]);
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`)); // TODO: that's funny 😅, change it.
+app.listen(port, () => console.log(`Endpoint Imposter listening on port ${port}!`));
