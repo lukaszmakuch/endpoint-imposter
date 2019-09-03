@@ -44,7 +44,6 @@
   </script>
   <script id="doc" type="text/markdown" src="index.html">
 
-
 Matching requests
 ---------------
 
@@ -173,6 +172,133 @@ It takes an [Express Request object](https://expressjs.com/en/4x/api.html#req) a
 },
 ```
 
+Scenarios
+---------------
+
+Real world endpoints don't always return the same responses for the same request. For example, the second `GET /items` request may return more items than the first one, just because an item has been added in the meantime by calling `POST /item`.
+
+So there are three different request-response pairs we may expect.
+```js
+{
+  request: { method: 'GET', path: '/items' },
+  response: { json: ['A', 'B'] },
+},
+
+{
+  request: {
+    method: 'POST',
+    path: '/item',
+    body: { content: 'C' },
+  },
+  response: { status: 204 },
+},
+
+{
+  request: { method: 'GET', path: '/items' },
+  response: { json: ['A', 'B', 'C'] },
+},
+```
+
+Unfortunately, this won't work. Calling `GET /items` will always return `['A', 'B']` and it doesn't matter how many times and when do we call `POST /item`.
+
+Scenarios allow us to express the following requirement in a declarative manner:
+> Keep returning `['A', 'B']` unless `POST /item` is called. As soon as `POST /item` responds, calling `GET /items` should return `['A', 'B', 'C']`.
+
+Let's start with associating all three mocks with the same `scenario` - `adding-items`.
+
+```js
+{
+  scenario: 'adding-items',
+  request: { method: 'GET', path: '/items' },
+  response: { json: ['A', 'B'] },
+},
+
+{
+  scenario: 'adding-items',
+  request: {
+    method: 'POST',
+    path: '/item',
+    body: { content: 'C' },
+  },
+  response: { status: 204 },
+},
+
+{
+  scenario: 'adding-items',
+  request: { method: 'GET', path: '/items' },
+  response: { json: ['A', 'B', 'C'] },
+},
+```
+
+Now it's time to specify the `step` when each mocks is active. 
+
+**The initial step is always called `start`.**
+
+```js
+{
+  scenario: 'adding-items',
+  step: 'start',
+  request: { method: 'GET', path: '/items' },
+  response: { json: ['A', 'B'] },
+},
+
+{
+  scenario: 'adding-items',
+  step: 'start',
+  request: {
+    method: 'POST',
+    path: '/item',
+    body: { content: 'C' },
+  },
+  response: { status: 204 },
+},
+
+{
+  scenario: 'adding-items',
+  step: 'added',
+  request: { method: 'GET', path: '/items' },
+  response: { json: ['A', 'B', 'C'] },
+},
+```
+
+The last thing to do is to tell Endpoint Imposter when should the current step change from `start` to `added`.
+
+We have two options:
+
+1. `afterRequest` - the transition occurs as soon as the request hits the mocked server.
+2. `afterResponse` - the transition happens only after the response is sent.
+
+This distinction is especially important when we manually control when responses are sent back.
+
+In our example we're going to use `afterResponse`.
+
+```js
+{
+  scenario: 'adding-items',
+  step: 'start',
+  request: { method: 'GET', path: '/items' },
+  response: { json: ['A', 'B'] },
+},
+
+{
+  scenario: 'adding-items',
+  step: 'start',
+  afterResponse: 'added',
+  request: {
+    method: 'POST',
+    path: '/item',
+    body: { content: 'C' },
+  },
+  response: { status: 204 },
+},
+
+{
+  scenario: 'adding-items',
+  step: 'added',
+  request: { method: 'GET', path: '/items' },
+  response: { json: ['A', 'B', 'C'] },
+},
+```
 
   </script>
 </head>
