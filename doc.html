@@ -44,6 +44,107 @@
   </script>
   <script id="doc" type="text/markdown" src="index.html">
 
+Setup
+---------------
+
+Create a file called `my-mocks.js` on your desktop and place the following content in it:
+
+```js
+module.exports = [
+  {
+    request: { path: '/todos' },
+    response: { json: ['a', 'b', 'c'] },
+  }
+]
+```
+
+Assuming that you have [npm](http://npmjs.com) installed, run this in your terminal:
+
+```none
+npx endpoint-imposter --port 3000 --mocks ~/Desktop/my-mocks.js
+```
+
+You may need to alter the file path if its different on your machine.
+
+Once you see something like this, you're ready to use Endpoint Imposter!
+```none
+$ npx endpoint-imposter --port 3000 --mocks ~/Desktop/my-mocks.js
+npx: installed 57 in 2.827s
+Endpoint Imposter listening on port 3000!
+```
+
+Test it by sending a request to `http://localhost:3000/sessionId/todos`:
+```none
+$ curl http://localhost:3000/sessionId/todos     
+["a","b","c"]%  
+```
+
+Sessions
+---------------
+
+Sessions allow multiple stateful mocks to run in parallel on a single Endpoint Impostor server.
+
+They isolate the state of mocks.
+
+They are identified by "session identifiers".
+
+Let's say we have mocks that look like this.
+```js
+
+{
+  scenario: 'stateful',
+  step: 'start',
+  request: { path: '/read' },
+  response: { body: 'A' },
+  afterRequest: 'read',
+},
+
+{
+  scenario: 'stateful',
+  step: 'read',
+  request: { path: '/read' },
+  response: { body: 'B' },
+},
+
+
+```
+
+Assuming that the mocked server is listening on `http://localhost:3000`, then **the application under test should request something like `http://localhost:3000/test-session-id1/read`, not `http://localhost:3000/read`**. 
+
+What's `test-session-id1`? It's a random session identifier.
+
+Think of this root URL suffix as of a cheap way of getting a separate "instance" of the mocks.
+
+From the tested app's point of view, the root URL is always something like `http://localhost:3000/some-string-here`, not just `http://localhost:3000`.
+
+This is how the mock visible above behaves.
+```none
+
+the first call in session abc
+GET http://localhost:3000/abc/read -> A 
+
+the second call in session abc
+GET http://localhost:3000/abc/read -> B 
+
+the first call in session xyz
+GET http://localhost:3000/xyz/read -> A 
+
+the third call in session abc
+GET http://localhost:3000/abc/read -> B 
+
+the second call in session xyz
+GET http://localhost:3000/xyz/read -> B 
+```
+
+Most probably you want to generate a random session ID when setting up your test case and then clear it after the test is over.
+
+To clear a session, send a request to `/admin/terminate`. It may be a GET request. Here are some examples: 
+
+```none
+http://localhost:3000/admin/terminate?session=abc
+http://localhost:3000/admin/terminate?session=xyz
+```
+
 Matching requests
 ---------------
 
@@ -171,6 +272,59 @@ It takes an [Express Request object](https://expressjs.com/en/4x/api.html#req) a
     .send('🎉'),
 },
 ```
+
+### Delaying
+
+You can write robust tests covering how does your application behave after a request is sent but before the response arrives through the means of manually released responses.
+
+Let's say that you have a simple endpoint that returns some data:
+```js
+{
+  request: { path: '/read' },
+  response: { body: '🎉' },
+},
+```
+
+Your application makes a request to `/read` and is expected to process `🎉` as soon as it arrives.
+
+But how does it behave in the meantime, when the request is ongoing?
+
+How to test it in a fast and robust way?
+
+Unlike many other tools, Endpoint Imposter doesn't even offer means of waiting x milliseconds before sending the response.
+
+Why? Because of robustness and speed.
+
+If a mocked server waits 500ms before sending a response, is this enough for the test case to make all the necessary assertions? Maybe. Sometimes. We don't know. And what if the test is very fast? Then it needs to wait, doing nothing, until the mocked server responds.
+
+Endpoint Imposter tackles this with release keys.
+
+First, we associate a release key with the mock. Here it's `give_results`.
+
+```js
+{
+  request: { path: '/read' },
+  response: { body: '🎉' },
+  releaseOn: 'give_results',
+},
+```
+
+When the system under test tries to fetch `/read`, the request will start, but it won't finish.
+
+It will be pending until the test case calls an address like this:
+```none
+/admin/release?session=my-session&key=give_results
+```
+Only then the mocked server will send the response to the application being tested.
+
+That way the test always has enough time to make all the necessary assertions and the mocked server responds as soon as the test is ready to continue.
+
+
+`/admin/release?session=sessionId&key=releaseKey` sends all the pending responses. It responds with HTTP 400 if there are no pending responses.
+
+`/admin/releaseOneRight?session=sessionId&key=releaseKey` sends the response to the most recent request. It responds with HTTP 400 if there are no more pending responses.
+
+`/admin/releaseOne?session=sessionId&key=releaseKey` sends the response to the most oldest request. It responds with HTTP 400 if there are no more pending responses.
 
 Scenarios
 ---------------
@@ -302,7 +456,7 @@ In our example we're going to use `afterResponse`.
 
   </script>
 </head>
-<body role='flatdoc'>
+<body role='flatdoc' class="no-literate">
 
   <div class='header'>
     <div class='left'>
