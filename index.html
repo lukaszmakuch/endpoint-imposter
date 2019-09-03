@@ -108,7 +108,7 @@
     <div class="container space-grid-col">
       <div class="space-grid-col header-container">
         <h1 class="main-header">Endpoint Imposter</h1>
-        <h2 class="slogan">Declarative, stateful, fast, and reusable HTTP mocks.</h2>
+        <h2 class="slogan">A mocking tool advanced enough to quickly test a ToDo app. Finally.</h2>
       </div>
 
       <div class="space-grid-col cover">
@@ -122,30 +122,32 @@
 
         <div class="space-grid-row sections">
           <div class="space-grid-col section">
-            <span class="section-header">Declarative statefulness</span>
+            <span class="section-header">Test a POST request. And test it well.</span>
             <p class="section-content">
-              Real endpoints don't always return the same result for the same request. With scenarios, you can model such behavior in a declarative manner.
+              Real endpoints don't always return the same result for the same request. With <a href="doc.html#-scenarios" target="_blank">declarative scenarios</a> you can replicate stateful behavior in a way that's simpler than implementing the actual service.
             </p>
           </div>
 
           <div class="space-grid-col section">
-            <span class="section-header">Control over when responses are sent back</span>
+            <span class="section-header">No more "delay 500ms"!</span>
             <p class="section-content">
-              No more brittle "delay 500ms"! The tests may tell the mocked sever when to finish a request the application started.
+              Are your tests randomly failing or taking ages to finish?
+              Chances are it's due to a race condition or pointless waiting.
+              Use <a href="doc.html#-generating-responses-delaying" target="_blank">release keys</a> to precisely control when a response is sent to the application under test!
             </p>
           </div>
         </div>
 
         <div class="space-grid-row sections">
           <div class="space-grid-col section">
-            <span class="section-header">Reusable test doubles</span>
+            <span class="section-header">Don't repeat yourself.</span>
             <p class="section-content">
              Test doubles are data that lives in JavaScript modules. You can reuse them like any other JavaScript module. You can transform them like any other data.
             </p>
           </div>
 
           <div class="space-grid-col section">
-            <span class="section-header">Scalable mental model</span>
+            <span class="section-header">The way to mock. Regardless what.</span>
             <p class="section-content">
               The way you build mocks is the same regardless if you're testing just a small function or the whole application.
             </p>
@@ -158,14 +160,14 @@
           <div class="space-grid-row sections">
 
             <div class="space-grid-col section">
-              <span class="section-header">Fast parallelism</span>
+              <span class="section-header">Run in parallel.</span>
               <p class="section-content">
-                No need to worry about the state leaking between tests. A suffix added the root URL gives you an instantaneous, isolated session.
+                Thanks to <a href="doc.html#-sessions" target="_blank">sessions</a> you don't need to worry about the state leaking between tests. Simply add a suffix to the URL and get instantaneous, isolated state.
               </p>
             </div>
 
             <div class="space-grid-col section">
-              <span class="section-header">Platform agnostic</span>
+              <span class="section-header">Test any app you want.</span>
               <p class="section-content">
                The mocks run as an independent HTTP server. Anything that works with HTTP will work with these mocks.
               </p>
