@@ -2,6 +2,8 @@
 const minimist = require('minimist');
 const express = require('express');
 const path = require('path');
+const https = require('https');
+const fs = require('fs');
 
 const { makeSessions, getTransitionCount, transition } = require('./sessions');
 const makeAdminApp = require('./admin');
@@ -11,6 +13,15 @@ const argv = minimist(process.argv.slice(2));
 
 const mocksPath = path.resolve(argv.mocks);
 const port = argv.port;
+const httpsPort = argv['https-port'];
+
+const keyPath = argv['https-key'] ? path.resolve(argv['https-key']) : path.resolve(__dirname, 'server.key');
+const certPath = argv['https-cert'] ? path.resolve(argv['https-cert']) : path.resolve(__dirname, 'server.cert');
+
+const httpsOptions = {
+  key: fs.readFileSync(keyPath),
+  cert: fs.readFileSync(certPath)
+};
 
 const sessions = makeSessions();
 const adminApp = makeAdminApp({ sessions });
@@ -100,7 +111,6 @@ const makeMockRouter = mockConfig => {
   return mockRouter;
 };
 
-
 let mockRouter;
 watchMockConfig(mocksPath, config => {
   sessions.terminateAllSessions();
@@ -117,4 +127,5 @@ const app = express();
 app.use('/admin', adminApp);
 app.use('/:sessionId', [sessionIdMiddleware, (...args) => mockRouter(...args)]);
 
-app.listen(port, () => console.log(`Endpoint Imposter listening on port ${port}!`));
+if (port) app.listen(port, () => console.log(`Endpoint Imposter listening on HTTP ${port}!`));
+if (httpsPort) https.createServer(httpsOptions, app).listen(httpsPort, () => console.log(`Endpoint Imposter listening on HTTPS ${httpsPort}!`));

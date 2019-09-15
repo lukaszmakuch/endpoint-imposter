@@ -1,13 +1,13 @@
 {
   "name": "endpoint-imposter",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "",
   "main": "src/index.js",
   "bin": {
     "endpoint-imposter": "./src/index.js"
   },
   "scripts": {
-    "test": "jest --runInBand"
+    "test": "NODE_EXTRA_CA_CERTS=./testutils/server.cert jest --runInBand"
   },
   "author": "Łukasz Makuch",
   "license": "MIT",
