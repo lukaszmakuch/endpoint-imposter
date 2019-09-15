@@ -70,13 +70,25 @@ Once you see something like this, you're ready to use Endpoint Imposter!
 ```none
 $ npx endpoint-imposter --port 3000 --mocks ~/Desktop/my-mocks.js
 npx: installed 57 in 2.827s
-Endpoint Imposter listening on port 3000!
+Endpoint Imposter listening on HTTP 3000!
 ```
 
 Test it by sending a request to `http://localhost:3000/sessionId/todos`:
 ```none
 $ curl http://localhost:3000/sessionId/todos     
 ["a","b","c"]%  
+```
+
+### HTTPS
+
+First, generate a self-signed certificate:
+```
+openssl req -nodes -new -x509 -keyout server.key -out server.cert
+```
+
+Then, tell Endpoint Imposter where to find it and what port should be used to serve over HTTPS:
+```
+$ npx endpoint-imposter --https-port 3002 --https-key server.key --https-cert server.cert --mocks ~/Desktop/my-mocks.js
 ```
 
 Sessions
