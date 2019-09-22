@@ -14,13 +14,14 @@
       :root {
         --text-color: #000;
         --background-color: #fff;
-        --accent-color: #7900dd;
+        --accent-color: #94c432;
       }
       body {
         font-size: 20px;
         font-family: 'PT Sans Narrow', sans-serif;
         display: flex;
-        justify-content: center;
+        flex-direction: column;
+        align-items: center;
         background-color: var(--background-color);
         color: var(--text-color);
       }
@@ -33,7 +34,6 @@
         width: 40em;
         max-width: 90%;
         padding: 1em 0;
-        min-height: 100vh;
         justify-content: center;
       }
       .main-header {
@@ -73,10 +73,10 @@
       }
       .section-content {
         line-height: 1.5em;
-        text-align: justify;
+        text-align: left;
       }
       .space-grid-col.container {
-        --gap: 7em;
+        --gap: 5em;
       }
       .action-btn {
         text-decoration: none;
@@ -91,6 +91,7 @@
       .action-btn:hover {
         background-color: var(--accent-color);
         color: var(--background-color);
+        text-decoration: none;
       }
       .page-footer {
         text-align: right;
@@ -102,18 +103,166 @@
       a:hover {
         text-decoration: underline;
       }
+
+      .quickstart {
+        padding: 5em 0;
+        display: grid;
+        width:95%;
+        justify-content: space-between;
+        
+        grid-template-areas:
+          "label1 label2 label3"
+          "img1 img2 img3";
+      }
+
+      @media screen and (min-width: 1200px) {
+        .quickstart {
+          grid-row-gap: 1em;
+        }
+
+        .quickstart_spacer1, .quickstart_spacer2 {
+          display: none;
+        }
+      }
+
+      @media screen and (max-width: 1200px) {
+        .quickstart {
+          width:90%;
+          grid-row-gap: 0em;
+          justify-content: center;
+          grid-column-gap: 1em;
+          grid-template-areas:
+            "label1 img1"
+            "spacer1 spacer1"
+            "img2 label2"
+            "spacer2 spacer2"
+            "label3 img3";
+        }
+
+        .quickstart_spacer1, .quickstart_spacer2 {
+          min-height: 3em;
+        }
+
+        .quickstart_label1-container {
+          text-align: right;
+        }
+
+        .quickstart_label2-container {
+          text-align: left;
+        }
+
+        .quickstart_label3-container {
+          text-align: right;
+        }
+      }
+
+      @media screen and (max-width: 750px) {
+        .quickstart {
+          justify-content: center;
+          width:90%;
+          grid-template-areas:
+            "label1"
+            "img1"
+            "spacer1"
+            "label2"
+            "img2"
+            "spacer2"
+            "label3"
+            "img3";
+        }
+
+        .quickstart_spacer1, .quickstart_spacer2 {
+          min-height: 2em;
+        }
+
+        .quickstart_label1-container, .quickstart_label2-container, .quickstart_label3-container {
+          text-align: center;
+          padding-bottom: 1em;
+        }
+
+        .quickstart__img1-container, .quickstart__img2-container, .quickstart__img3-container {
+          display: flex;
+          justify-content: center;
+        }
+      }
+
+      .quickstart__img1, .quickstart__img2, .quickstart__img3 {
+        max-width: 100%;
+        border-radius: 6px;
+        box-shadow: 10px 20px 40px #999;
+        background-color: #999;
+      }
+
+      .quickstart_label1-container, .quickstart_label2-container, .quickstart_label3-container {
+        font-weight: bold;
+      }
+
+      .quickstart_label1-container {grid-area: label1; }
+      .quickstart_label2-container {grid-area: label2; }
+      .quickstart_label3-container {grid-area: label3; }
+      .quickstart__img1-container {grid-area: img1; }
+      .quickstart__img2-container {grid-area: img2; }
+      .quickstart__img3-container {grid-area: img3; }
+      .quickstart_spacer1 {grid-area: spacer1; }
+      .quickstart_spacer2 {grid-area: spacer2; }
     </style>
   </head>
   <body>
+
     <div class="container space-grid-col">
       <div class="space-grid-col header-container">
         <h1 class="main-header">Endpoint Imposter</h1>
         <h2 class="slogan">Advanced enough to mock a ToDo app. Simpler than a ToDo app.</h2>
       </div>
+    </div>
+
+    <div class="quickstart">
+      <div class="quickstart_spacer1"></div>
+      <div class="quickstart_spacer2"></div>
+
+      <div class="quickstart_label1-container">
+        <label for="quickstart__card1" class="quickstart_label1">1. Define your mocks</label>
+      </div>
+      <div class="quickstart__img1-container">
+        <img 
+          id="quickstart__card1"
+          class="quickstart__img1" 
+          src="mocks.png"
+          srcset="mocks.png 2x"
+          alt="declarative mocks"/>
+      </div>
+
+      <div class="quickstart_label2-container">
+        <label for="quickstart__card2" class="quickstart_label2">2. Launch Endpoint Imposter</label>
+      </div>
+      <div class="quickstart__img2-container">
+        <img 
+          id="quickstart__card2"
+          class="quickstart__img2" 
+          src="running.png"
+          srcset="running.png 2x"
+          alt="declarative mocks"/>
+      </div>
+
+      <div class="quickstart_label3-container">
+        <label for="quickstart__card3" class="quickstart_label3">3. Hit the mock!</label>
+      </div>
+      <div class="quickstart__img3-container">
+        <img 
+          id="quickstart__card3"
+          class="quickstart__img3" 
+          src="using.png"
+          srcset="using.png 2x"
+          alt="declarative mocks"/>
+      </div>
+
+    </div>
+
+    <div class="container space-grid-col">
 
       <div class="space-grid-col cover">
         <div class="space-grid-row action-btns">
-          <a target="_blank" href="https://github.com/lukaszmakuch/endpoint-imposter" class="action-btn">Source code</a>
+          <a target="_blank" rel="noopener" href="https://github.com/lukaszmakuch/endpoint-imposter" class="action-btn">Get the code!</a>
           <a target="_blank" href="doc.html" class="action-btn">Documentation</a>
         </div>
       </div>
@@ -176,7 +325,7 @@
           </div>
 
       </div>
-      <footer class="page-footer"><a href="https://lukaszmakuch.pl">lukaszmakuch.pl</a></footer>
+      <footer class="page-footer"><a href="https://lukaszmakuch.pl" rel="noopener" target="_blank">lukaszmakuch.pl</a></footer>
     </div>
   </body>
 </html>
