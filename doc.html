@@ -343,7 +343,7 @@ That way the test always has enough time to make all the necessary assertions an
 
 `/admin/releaseOneRight?session=sessionId&key=releaseKey` sends the response to the most recent request. It responds with HTTP 400 if there are no more pending responses.
 
-`/admin/releaseOne?session=sessionId&key=releaseKey` sends the response to the most oldest request. It responds with HTTP 400 if there are no more pending responses.
+`/admin/releaseOne?session=sessionId&key=releaseKey` sends the response to the oldest request. It responds with HTTP 400 if there are no more pending responses.
 
 Scenarios
 ---------------
