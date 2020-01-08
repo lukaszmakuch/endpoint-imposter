@@ -118,6 +118,7 @@ watchMockConfig(mocksPath, config => {
   mockRouter = makeMockRouter(unifyMockConfig(config));
   mocksHealth.set(true);
 }, () => {
+  sessions.terminateAllSessions();
   mockRouter = makeMockRouter(unifyMockConfig([]));
   mocksHealth.set(false);
 });
