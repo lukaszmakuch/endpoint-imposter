@@ -3,12 +3,21 @@ const sift = require('sift').default;
 const importFresh = require('import-fresh');
 const { getScenarioStep } = require('./sessions.js');
 
-const watchMockConfig = (filename, cb) => {
+const makeMocksHealthService = () => {
+  let healthy = true;
+  return {
+    read: () => healthy,
+    set: newValue => healthy = newValue,
+  };
+};
+
+const watchMockConfig = (filename, cb, onError) => {
   const loadFresh = () => {
     try {
       const config = importFresh(filename);
       cb(config);
     } catch (e) {
+      onError();
       console.error('Unable to load the mocks.');
       console.error(e);
     }
@@ -115,4 +124,5 @@ module.exports = {
   unifyMockConfig,
   mockMatches,
   prepareRequestForMatching,
+  makeMocksHealthService,
 };
