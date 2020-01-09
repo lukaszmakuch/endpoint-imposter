@@ -89,7 +89,7 @@ const getOrBuildResponseGenerator = ({ responseGenerator, response }) => {
   return (req, res) => res.status(400).send('Missing response generator.'); // TODO: test this
 };
 
-// Reduces mocks like 
+// Reduces mocks like
 // {requestPattern, requestMatcher, responseGenerator, response, ...}
 // to a unified format like {requestMatcher, responseGenerator, ...}
 const unifyMockConfig = rawConfig => {
@@ -119,10 +119,16 @@ const mockMatches = (session, req) => mock => {
   return mock.requestMatcher(req);
 };
 
+const unmatchedRequestMiddleware = (req, res) => {
+  console.warn('No matching mock found for the following request:', prepareRequestForMatching(req));
+  return res.status(404).send('No matching mock. 😭');
+}
+
 module.exports = {
   watchMockConfig,
   unifyMockConfig,
   mockMatches,
   prepareRequestForMatching,
   makeMocksHealthService,
+  unmatchedRequestMiddleware,
 };
