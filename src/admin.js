@@ -39,8 +39,7 @@ const makeSingleReleaseCb = keyToRelease => {
   };
 };
 
-module.exports = ({ sessions }) => {
-
+module.exports = ({ sessions, mocksHealth }) => {
   const updatePendingResponses = ({
     filter, action, sessionId, responseGenerator
   }) => {
@@ -105,6 +104,11 @@ module.exports = ({ sessions }) => {
       case 'terminated':
         return res.status(200).send();
     }
+  });
+
+  app.get('/health/mocks', (req, res) => {
+    const status = mocksHealth.read() ? 200 : 500;
+    return res.status(status).send();
   });
 
   return app;

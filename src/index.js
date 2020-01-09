@@ -7,7 +7,7 @@ const fs = require('fs');
 
 const { makeSessions, getTransitionCount, transition } = require('./sessions');
 const makeAdminApp = require('./admin');
-const { watchMockConfig, unifyMockConfig, mockMatches, prepareRequestForMatching } = require('./mocks');
+const { watchMockConfig, unifyMockConfig, mockMatches, prepareRequestForMatching, makeMocksHealthService } = require('./mocks');
 
 const argv = minimist(process.argv.slice(2));
 
@@ -24,7 +24,6 @@ const httpsOptions = {
 };
 
 const sessions = makeSessions();
-const adminApp = makeAdminApp({ sessions });
 
 // TODO: extract somewhere
 const transitionActions = (session, mock) => {
@@ -111,10 +110,17 @@ const makeMockRouter = mockConfig => {
   return mockRouter;
 };
 
+const mocksHealth = makeMocksHealthService();
+
 let mockRouter;
 watchMockConfig(mocksPath, config => {
   sessions.terminateAllSessions();
   mockRouter = makeMockRouter(unifyMockConfig(config));
+  mocksHealth.set(true);
+}, () => {
+  sessions.terminateAllSessions();
+  mockRouter = makeMockRouter(unifyMockConfig([]));
+  mocksHealth.set(false);
 });
 
 const sessionIdMiddleware = (req, res, next) => {
@@ -124,6 +130,7 @@ const sessionIdMiddleware = (req, res, next) => {
 
 const app = express();
 
+const adminApp = makeAdminApp({ sessions, mocksHealth });
 app.use('/admin', adminApp);
 app.use('/:sessionId', [sessionIdMiddleware, (...args) => mockRouter(...args)]);
 
