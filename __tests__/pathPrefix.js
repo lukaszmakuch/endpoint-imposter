@@ -1,10 +1,10 @@
-const { withServer, resolveMockFile } = require('../testUtils/server');
+const { withServer, resolveMockDir } = require('../testUtils/server');
 const waitForExpect = require('wait-for-expect');
 
 it('allows to add prefix the path', () => withServer({
-  '--mocks': resolveMockFile('pathPrefix.js'),
+  '--mocks': resolveMockDir('pathPrefix'),
   '--port': 3000,
-}, async ({ client, setMocksFile }) => {
+}, async ({ client }) => {
   await waitForExpect(async () => {
     expect(
       (await client.post('/s/pattern/a', { should: 'match' })).data

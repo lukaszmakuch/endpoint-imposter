@@ -1,10 +1,10 @@
-const { withServer, resolveMockFile } = require('../../../testUtils/server');
+const { withServer, resolveMockDir } = require('../../../testUtils/server');
 const waitForExpect = require('wait-for-expect');
 
 it('tells when mocks could not be loaded', () => withServer({
-  '--mocks': resolveMockFile('health/mocks/syntax/correct.js'),
+  '--mocks': resolveMockDir('health/mocks/syntax/correct'),
   '--port': 3000,
-}, async ({ client, setMocksFile }) => {
+}, async ({ client, setMocksDir }) => {
   await waitForExpect(async () => {
     expect((await client.get('/s/ping')).data).toEqual('pong');
     expect((await client.get('/admin/health/mocks')).status).toEqual(200);
@@ -20,7 +20,7 @@ it('tells when mocks could not be loaded', () => withServer({
   });
 
   // change the mocks only after the delayed response has been initialised
-  setMocksFile(resolveMockFile('health/mocks/syntax/incorrect.js'));
+  setMocksDir(resolveMockDir('health/mocks/syntax/incorrect'));
 
   await waitForExpect(async () => {
     expect((await client.get('/s/ping')).status).toEqual(404);
@@ -28,7 +28,7 @@ it('tells when mocks could not be loaded', () => withServer({
     expect(delayedRequestResponseCode).toEqual(400);
   });
 
-  setMocksFile(resolveMockFile('health/mocks/syntax/different_correct.js'));
+  setMocksDir(resolveMockDir('health/mocks/syntax/different_correct'));
 
   await waitForExpect(async () => {
     expect((await client.get('/s/ping')).data).toEqual('PONG!');

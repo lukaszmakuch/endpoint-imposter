@@ -1,6 +1,6 @@
 const fs = require('fs');
 const sift = require('sift').default;
-const importFresh = require('import-fresh');
+const clearModule = require('clear-module');
 const { getScenarioStep } = require('./sessions.js');
 
 const makeMocksHealthService = () => {
@@ -14,7 +14,8 @@ const makeMocksHealthService = () => {
 const watchMockConfig = (filename, cb, onError) => {
   const loadFresh = () => {
     try {
-      const config = importFresh(filename);
+      clearModule(filename);
+      const config = require(filename);
       cb(config);
     } catch (e) {
       onError();
@@ -23,9 +24,7 @@ const watchMockConfig = (filename, cb, onError) => {
     }
   };
   loadFresh();
-  fs.watch(filename, {}, (eventType, filename) => {
-    if (eventType === 'change') loadFresh();
-  });
+  fs.watch(filename, { recursive: true }, loadFresh);
 };
 
 const prepareRequestForMatching = req => ({

@@ -1,8 +1,8 @@
-const { withServer, resolveMockFile } = require('../testUtils/server');
+const { withServer, resolveMockDir } = require('../testUtils/server');
 const querystring = require('querystring');
 
 it('allows to match express request objects with a custom function', () => withServer({
-  '--mocks': resolveMockFile('requests.js'),
+  '--mocks': resolveMockDir('requests'),
   '--port': 3000,
 }, async ({ client }) => {
   const response = await client.get('/s/custom-fn');
@@ -11,7 +11,7 @@ it('allows to match express request objects with a custom function', () => withS
 }));
 
 it('combines custom functions with patterns', () => withServer({
-  '--mocks': resolveMockFile('requests.js'),
+  '--mocks': resolveMockDir('requests'),
   '--port': 3000,
 }, async ({ client }) => {
   const response = await client.post('/s/combined');
@@ -21,7 +21,7 @@ it('combines custom functions with patterns', () => withServer({
 }));
 
 it('supports path patterns', () => withServer({
-  '--mocks': resolveMockFile('requests.js'),
+  '--mocks': resolveMockDir('requests'),
   '--port': 3000,
 }, async ({ client }) => {
   const response = await client.get('/s/path-pattern');
@@ -30,7 +30,7 @@ it('supports path patterns', () => withServer({
 }));
 
 it('supports headers patterns', () => withServer({
-  '--mocks': resolveMockFile('requests.js'),
+  '--mocks': resolveMockDir('requests'),
   '--port': 3000,
 }, async ({ client }) => {
   expect((await client.get('/s/', { headers: { 
@@ -48,7 +48,7 @@ it('supports headers patterns', () => withServer({
 }));
 
 it('supports query patterns', () => withServer({
-  '--mocks': resolveMockFile('requests.js'),
+  '--mocks': resolveMockDir('requests'),
   '--port': 3000,
 }, async ({ client }) => {
   expect((await client.get('/s/query-pattern?a=x&b=y')).status).toEqual(200);
@@ -59,7 +59,7 @@ it('supports query patterns', () => withServer({
 }));
 
 it('supports body patterns', () => withServer({
-  '--mocks': resolveMockFile('requests.js'),
+  '--mocks': resolveMockDir('requests'),
   '--port': 3000,
 }, async ({ client }) => {
   expect((await client.post('/s/body-pattern', {a: 'x', b: 'y'})).status).toEqual(200);

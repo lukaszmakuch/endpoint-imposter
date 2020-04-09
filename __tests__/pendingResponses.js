@@ -1,8 +1,8 @@
-const { withServer, resolveMockFile } = require('../testUtils/server');
+const { withServer, resolveMockDir } = require('../testUtils/server');
 const waitForExpect = require('wait-for-expect');
 
 it('allows to send a response to the recent request', () => withServer({
-  '--mocks': resolveMockFile('pendingResponses.js'),
+  '--mocks': resolveMockDir('pendingResponses'),
   '--port': 3000,
 }, async ({ client }) => {
   let events = [];
@@ -67,7 +67,7 @@ it('allows to send a response to the recent request', () => withServer({
 }));
 
 it('allows to send just one of the pending responses', () => withServer({
-  '--mocks': resolveMockFile('pendingResponses.js'),
+  '--mocks': resolveMockDir('pendingResponses'),
   '--port': 3000,
 }, async ({ client }) => {
   let events = [];
@@ -132,7 +132,7 @@ it('allows to send just one of the pending responses', () => withServer({
 }));
 
 it('allows to control when a response is sent', () => withServer({
-  '--mocks': resolveMockFile('pendingResponses.js'),
+  '--mocks': resolveMockDir('pendingResponses'),
   '--port': 3000,
 }, async ({ client }) => {
   let events = [];
