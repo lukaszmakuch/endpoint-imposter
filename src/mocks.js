@@ -8,7 +8,6 @@ const watchMockConfig = (filename, cb) => {
     try {
       clearModule(filename);
       const config = require(filename);
-      console.log(config)
       cb(config);
     } catch (e) {
       console.error('Unable to load the mocks.');

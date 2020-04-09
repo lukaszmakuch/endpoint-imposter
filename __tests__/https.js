@@ -2,7 +2,6 @@ const { withServer, resolveMockDir } = require('../testUtils/server');
 const https = require('https');
 const path = require('path');
 const axios = require('axios');
-const fs = require('fs');
 
 it('spins up an HTTPS server with a self signed certificate', () => withServer({
   '--mocks': resolveMockDir('https'),
