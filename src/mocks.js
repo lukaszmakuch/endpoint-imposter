@@ -3,13 +3,22 @@ const sift = require('sift').default;
 const clearModule = require('clear-module');
 const { getScenarioStep } = require('./sessions.js');
 
-const watchMockConfig = (filename, cb) => {
+const makeMocksHealthService = () => {
+  let healthy = true;
+  return {
+    read: () => healthy,
+    set: newValue => healthy = newValue,
+  };
+};
+
+const watchMockConfig = (filename, cb, onError) => {
   const loadFresh = () => {
     try {
       clearModule(filename);
       const config = require(filename);
       cb(config);
     } catch (e) {
+      onError();
       console.error('Unable to load the mocks.');
       console.error(e);
     }
@@ -79,7 +88,7 @@ const getOrBuildResponseGenerator = ({ responseGenerator, response }) => {
   return (req, res) => res.status(400).send('Missing response generator.'); // TODO: test this
 };
 
-// Reduces mocks like 
+// Reduces mocks like
 // {requestPattern, requestMatcher, responseGenerator, response, ...}
 // to a unified format like {requestMatcher, responseGenerator, ...}
 const unifyMockConfig = rawConfig => {
@@ -109,9 +118,16 @@ const mockMatches = (session, req) => mock => {
   return mock.requestMatcher(req);
 };
 
+const unmatchedRequestMiddleware = (req, res) => {
+  console.warn('No matching mock found for the following request:', prepareRequestForMatching(req));
+  return res.status(404).send('No matching mock. 😭');
+}
+
 module.exports = {
   watchMockConfig,
   unifyMockConfig,
   mockMatches,
   prepareRequestForMatching,
+  makeMocksHealthService,
+  unmatchedRequestMiddleware,
 };

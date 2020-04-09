@@ -7,7 +7,7 @@ const fs = require('fs');
 
 const { makeSessions, getTransitionCount, transition } = require('./sessions');
 const makeAdminApp = require('./admin');
-const { watchMockConfig, unifyMockConfig, mockMatches, prepareRequestForMatching } = require('./mocks');
+const { watchMockConfig, unifyMockConfig, mockMatches, prepareRequestForMatching, makeMocksHealthService, unmatchedRequestMiddleware } = require('./mocks');
 
 const argv = minimist(process.argv.slice(2));
 
@@ -24,7 +24,6 @@ const httpsOptions = {
 };
 
 const sessions = makeSessions();
-const adminApp = makeAdminApp({ sessions });
 
 // TODO: extract somewhere
 const transitionActions = (session, mock) => {
@@ -55,15 +54,11 @@ const makeMockRouter = mockConfig => {
   const mocksByPathPrefix = groupByPathPrefix(mockConfig);
   const subAppsToMount = Object.entries(mocksByPathPrefix).map(([prefix, mocks]) => {
     const subApp = express();
-    subApp.all('/*', (req, res) => {
+    subApp.all('/*', (req, res, next) => {
       const { sessionId } = req;
       const session = sessions.getSession(sessionId);
       const matchingMock = mocks.find(mockMatches(session, req));
-      if (!matchingMock) {
-        console.warn('No matching mock found for the following request:', prepareRequestForMatching(req));
-        console.warn('The current session:', session);
-        return res.status(400).send('No matching mock. 😭');
-      }
+      if (!matchingMock) return next();
       const { afterRequest, afterResponse } = transitionActions(session, matchingMock);
 
       const { releaseOn, responseGenerator } = matchingMock;
@@ -106,15 +101,22 @@ const makeMockRouter = mockConfig => {
 
   subAppsToMount
     .sort(([prefixA], [prefixB]) => prefixB.length - prefixA.length)
-    .forEach(([prefix, subApp]) => mockRouter.use('/' + prefix, subApp));
-  
+    .forEach(([prefix, subApp]) => mockRouter.use('/' + prefix, subApp, unmatchedRequestMiddleware));
+
   return mockRouter;
 };
+
+const mocksHealth = makeMocksHealthService();
 
 let mockRouter;
 watchMockConfig(mocksPath, config => {
   sessions.terminateAllSessions();
   mockRouter = makeMockRouter(unifyMockConfig(config));
+  mocksHealth.set(true);
+}, () => {
+  sessions.terminateAllSessions();
+  mockRouter = makeMockRouter(unifyMockConfig([]));
+  mocksHealth.set(false);
 });
 
 const sessionIdMiddleware = (req, res, next) => {
@@ -124,8 +126,9 @@ const sessionIdMiddleware = (req, res, next) => {
 
 const app = express();
 
+const adminApp = makeAdminApp({ sessions, mocksHealth });
 app.use('/admin', adminApp);
-app.use('/:sessionId', [sessionIdMiddleware, (...args) => mockRouter(...args)]);
+app.use('/:sessionId', sessionIdMiddleware, (...args) => mockRouter(...args), unmatchedRequestMiddleware);
 
 if (port) app.listen(port, () => console.log(`Endpoint Imposter listening on HTTP ${port}!`));
 if (httpsPort) https.createServer(httpsOptions, app).listen(httpsPort, () => console.log(`Endpoint Imposter listening on HTTPS ${httpsPort}!`));

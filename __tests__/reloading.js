@@ -14,12 +14,17 @@ it('allows to reload a file while the server is running', () => withServer({
   });
   
   const pendingRequest = client.get('/s/pending');
-  
+
   fs.copyFileSync(
     path.resolve(resolveMockDir('reloading/v2'), 'sub', 'subfile.js'),
     path.resolve(mockDir, 'sub', 'subfile.js'),
   );
-  
+
+  // wait for the pending response to be initialised
+  await waitForExpect(async () => {
+    expect((await client.get('/s/pending')).data).toEqual('not released yet');
+  });
+
   await waitForExpect(async () => {
     expect((await pendingRequest).status).toEqual(400);
     expect((await client.get('/s/a')).data).not.toEqual('A');
