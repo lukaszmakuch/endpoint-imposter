@@ -78,7 +78,7 @@ const startServer = async (rawOptions) => {
     waitForAllResponses,
   }
 
-  return { serverProcess, close, client, setMocksDir, mockDir: mockDir.name };
+  return { serverProcess, close, client, mockDir: mockDir.name };
 };
 
 const withServer = async (options, cb) => {
