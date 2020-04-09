@@ -1,7 +1,7 @@
-const { withServer, resolveMockFile } = require('../testUtils/server');
+const { withServer, resolveMockDir } = require('../testUtils/server');
 
 it('allows to use express response objects', () => withServer({
-  '--mocks': resolveMockFile('responses.js'),
+  '--mocks': resolveMockDir('responses'),
   '--port': 3000,
 }, async ({ client }) => {
   const response = await client.get('/the-session-id/express-res?number=123');
@@ -11,7 +11,7 @@ it('allows to use express response objects', () => withServer({
 }));
 
 it('allows to send JSON using declarative templates', () => withServer({
-  '--mocks': resolveMockFile('responses.js'),
+  '--mocks': resolveMockDir('responses'),
   '--port': 3000,
 }, async ({ client }) => {
   const response = await client.get('/the-session-id/res-template-json');
@@ -21,7 +21,7 @@ it('allows to send JSON using declarative templates', () => withServer({
 }));
 
 it('allows to set the raw response body using declarative templates', () => withServer({
-  '--mocks': resolveMockFile('responses.js'),
+  '--mocks': resolveMockDir('responses'),
   '--port': 3000,
 }, async ({ client }) => {
   const response = await client.get('/the-session-id/res-template-body');
@@ -31,7 +31,7 @@ it('allows to set the raw response body using declarative templates', () => with
 }));
 
 it('supports partial templates - just JSON', () => withServer({
-  '--mocks': resolveMockFile('responses.js'),
+  '--mocks': resolveMockDir('responses'),
   '--port': 3000,
 }, async ({ client }) => {
   const response = await client.get('/the-session-id/res-template-partial-just-json');
@@ -40,7 +40,7 @@ it('supports partial templates - just JSON', () => withServer({
 }));
 
 it('supports partial templates - just status', () => withServer({
-  '--mocks': resolveMockFile('responses.js'),
+  '--mocks': resolveMockDir('responses'),
   '--port': 3000,
 }, async ({ client }) => {
   const response = await client.get('/the-session-id/res-template-partial-just-status');
@@ -48,7 +48,7 @@ it('supports partial templates - just status', () => withServer({
 }));
 
 it('supports partial templates - just headers', () => withServer({
-  '--mocks': resolveMockFile('responses.js'),
+  '--mocks': resolveMockDir('responses'),
   '--port': 3000,
 }, async ({ client }) => {
   const response = await client.get('/the-session-id/res-template-partial-just-headers');
@@ -57,7 +57,7 @@ it('supports partial templates - just headers', () => withServer({
 }));
 
 it('supports partial templates - just body', () => withServer({
-  '--mocks': resolveMockFile('responses.js'),
+  '--mocks': resolveMockDir('responses'),
   '--port': 3000,
 }, async ({ client }) => {
   const response = await client.get('/the-session-id/res-template-partial-just-body');

@@ -1,12 +1,14 @@
 const fs = require('fs');
 const sift = require('sift').default;
-const importFresh = require('import-fresh');
+const clearModule = require('clear-module');
 const { getScenarioStep } = require('./sessions.js');
 
 const watchMockConfig = (filename, cb) => {
   const loadFresh = () => {
     try {
-      const config = importFresh(filename);
+      clearModule(filename);
+      const config = require(filename);
+      console.log(config)
       cb(config);
     } catch (e) {
       console.error('Unable to load the mocks.');
@@ -14,9 +16,7 @@ const watchMockConfig = (filename, cb) => {
     }
   };
   loadFresh();
-  fs.watch(filename, {}, (eventType, filename) => {
-    if (eventType === 'change') loadFresh();
-  });
+  fs.watch(filename, { recursive: true }, loadFresh);
 };
 
 const prepareRequestForMatching = req => ({

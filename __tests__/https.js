@@ -1,12 +1,11 @@
-const { withServer, resolveMockFile } = require('../testUtils/server');
-const waitForExpect = require('wait-for-expect');
+const { withServer, resolveMockDir } = require('../testUtils/server');
 const https = require('https');
 const path = require('path');
 const axios = require('axios');
 const fs = require('fs');
 
 it('spins up an HTTPS server with a self signed certificate', () => withServer({
-  '--mocks': resolveMockFile('https.js'),
+  '--mocks': resolveMockDir('https'),
   '--https-port': 3001,
 }, async () => {
   const res = await axios.get(
@@ -21,7 +20,7 @@ it('spins up an HTTPS server with a self signed certificate', () => withServer({
 }));
 
 it('spins up an HTTPS server with the provided certificate', () => withServer({
-    '--mocks': resolveMockFile('https.js'),
+    '--mocks': resolveMockDir('https'),
     '--https-cert': path.resolve(__dirname, '../testUtils/server.cert'),
     '--https-key': path.resolve(__dirname, '../testUtils/server.key'),
     '--https-port': 3001,

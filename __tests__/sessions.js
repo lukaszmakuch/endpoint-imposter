@@ -1,8 +1,8 @@
-const { withServer, resolveMockFile } = require('../testUtils/server');
+const { withServer, resolveMockDir } = require('../testUtils/server');
 const waitForExpect = require('wait-for-expect');
 
 it('runs multiple instances of the same machine', () => withServer({
-  '--mocks': resolveMockFile('sessions.js'),
+  '--mocks': resolveMockDir('sessions'),
   '--port': 3000,
 }, async ({ client }) => {
 
@@ -67,7 +67,7 @@ it('runs multiple instances of the same machine', () => withServer({
 }));
 
 it('allows to terminate a session', () => withServer({
-  '--mocks': resolveMockFile('sessions.js'),
+  '--mocks': resolveMockDir('sessions'),
   '--port': 3000,
 }, async ({ client }) => {
   let events = [];

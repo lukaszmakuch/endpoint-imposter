@@ -2,20 +2,22 @@ const { spawn } = require('child_process');
 const path = require('path');
 const axios = require('axios');
 const tmp = require('tmp');
-const fs = require('fs');
+const util = require('util');
+const ncpCb = require('ncp').ncp;
+const ncp = util.promisify(ncpCb);
 
-const resolveMockFile = filename => path.resolve(__dirname, '../testUtils/mocks', filename);
+const resolveMockDir = dirname => path.resolve(__dirname, '../testUtils/mocks', dirname);
 
 const startServer = async (rawOptions) => {
 
   // copy the template mocks file to a temporary file
-  const mocksFile = tmp.fileSync();
+  const mockDir = tmp.dirSync();
   let options;
-  let setMocksFile = () => {};
+  let setMocksDir = () => {};
   if (rawOptions['--mocks']) {
-    setMocksFile = filename => fs.copyFileSync(filename, mocksFile.name);
-    setMocksFile(rawOptions['--mocks']);
-    options = { ...rawOptions, '--mocks': mocksFile.name };
+    setMocksDir = sourceDir => ncp(sourceDir, mockDir.name);
+    await setMocksDir(rawOptions['--mocks']);
+    options = { ...rawOptions, '--mocks': mockDir.name };
   } else {
     options = rawOptions;
   }
@@ -47,7 +49,7 @@ const startServer = async (rawOptions) => {
   // send the SIGTERM signal and wait for it to close
   const close = () => (new Promise((resolve, reject) => {
     serverProcess.on('exit', (code) => {
-      mocksFile.removeCallback();
+      mockDir.removeCallback();
       resolve();
     });
     serverProcess.kill('SIGTERM');
@@ -76,7 +78,7 @@ const startServer = async (rawOptions) => {
     waitForAllResponses,
   }
 
-  return { serverProcess, close, client, setMocksFile };
+  return { serverProcess, close, client, setMocksDir, mockDir: mockDir.name };
 };
 
 const withServer = async (options, cb) => {
@@ -91,4 +93,4 @@ const withServer = async (options, cb) => {
   }
 };
 
-module.exports = { resolveMockFile, startServer, withServer };
+module.exports = { resolveMockDir, startServer, withServer };
