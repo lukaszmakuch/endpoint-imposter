@@ -1,7 +1,25 @@
 const fs = require('fs');
 const sift = require('sift').default;
-const clearModule = require('clear-module');
+// const clearModule = require('clear-module'); TODO: it's buggy, use it once it's fixed
 const { getScenarioStep } = require('./sessions.js');
+
+
+// clearModule temporary replacement - start
+const subtree = (root, listOfNodes) => {
+  if (listOfNodes.includes(root)) return;
+  
+  const resolved = require.resolve(root);
+  listOfNodes.push(resolved)
+  const { children } = (require.cache[resolved] || { children: [] });
+  children.forEach(({ id }) => subtree(id, listOfNodes))
+}
+
+const clearModule = path => {
+  let toDelete = [];
+  subtree(path, toDelete);
+  toDelete.forEach(path => delete require.cache[path]);
+}
+// clearModule temporary replacement - end
 
 const makeMocksHealthService = () => {
   let healthy = true;
