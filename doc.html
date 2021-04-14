@@ -539,6 +539,15 @@ In our example we're going to use `afterResponse`.
 },
 ```
 
+Health checks
+---------------
+
+### Mocks
+```/admin/health/mocks```
+
+Calling `/admin/health/mocks` results in the 500 error code if the mocks couldn't be loaded.
+It responds with HTTP 200 if mocks are properly loaded.
+
   </script>
 </head>
 <body role='flatdoc' class="no-literate">
