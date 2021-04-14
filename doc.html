@@ -102,6 +102,68 @@ Then, tell Endpoint Imposter where to find it and what port should be used to se
 $ npx endpoint-imposter --https-port 3002 --https-key server.key --https-cert server.cert --mocks ~/Desktop/my-mocks.js
 ```
 
+### Project setup example
+
+Below is an example setup of Endpoint Imposter used to test a web application. You may want to use it as a starting point. But please bear in mind it's just a suggestion and not a requirement. Feel free to structure your mocks and test anyway you like.
+
+Each module has its own directory of mocks. Each mock corresponds to a separate test case.
+
+```none
+.
+└── mocks
+    ├── index.js
+    ├── module_a
+    |    ├── index.js
+    |    ├── case_a.js
+    |    └── case_b.js
+    └── module_b
+         ├── index.js
+         ├── case_a.js
+         └── case_b.js
+```
+
+`index.js` files merge what's exported by their siblings, like that:
+```js
+module.exports = [
+  ...require('./module_a'),
+  ...require('./module_b'),
+];
+```
+
+Mocks are prefixed in a way that reflects the directory structure:
+```js
+// mocks/module_b/case_a.js
+module.exports = [
+ {
+   pathPrefix: 'module_b-case_a',
+   request: { path: '/ids' },
+   response: { json: [1, 2, 3] },
+ },
+];
+```
+
+Tests follow the same structure:
+```none
+.
+└── tests
+    ├── module_a
+    |    ├── case_a.js
+    |    └── case_b.js
+    └── module_b
+         ├── case_a.js
+         └── case_b.js
+```
+
+In the setup stage of each test case, I instruct the app under test to issue requests to Endpoint Imposter instead of the real API. Something like that:
+```js
+// tests/module_b/case_a
+let endpointImposterSession = uuid();
+setApiRoot(`${process.env.ENDPOINT_IMPOSTER_URL}/${endpointImposterSession}/module_b-case_a`);
+```
+Please note I'm including the prefix (`module_b-case_a`) as well so that this particular test case uses only the mocks intended for it. That way other mocks won't leak into it.
+
+What's worth keeping in mind is that it's all just JavaScript. So if you find yourself repeating something over and over again, it may be worth extracting it into a utility function.
+
 Sessions
 ---------------
 
