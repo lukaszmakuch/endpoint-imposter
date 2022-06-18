@@ -1,31 +1,30 @@
-const fs = require('fs');
-const sift = require('sift').default;
+const fs = require("fs");
+const sift = require("sift").default;
 // const clearModule = require('clear-module'); TODO: it's buggy, use it once it's fixed
-const { getScenarioStep } = require('./sessions.js');
-
+const { getScenarioStep } = require("./sessions.js");
 
 // clearModule temporary replacement - start
 const subtree = (root, listOfNodes) => {
   if (listOfNodes.includes(root)) return;
-  
-  const resolved = require.resolve(root);
-  listOfNodes.push(resolved)
-  const { children } = (require.cache[resolved] || { children: [] });
-  children.forEach(({ id }) => subtree(id, listOfNodes))
-}
 
-const clearModule = path => {
+  const resolved = require.resolve(root);
+  listOfNodes.push(resolved);
+  const { children } = require.cache[resolved] || { children: [] };
+  children.forEach(({ id }) => subtree(id, listOfNodes));
+};
+
+const clearModule = (path) => {
   let toDelete = [];
   subtree(path, toDelete);
-  toDelete.forEach(path => delete require.cache[path]);
-}
+  toDelete.forEach((path) => delete require.cache[path]);
+};
 // clearModule temporary replacement - end
 
 const makeMocksHealthService = () => {
   let healthy = true;
   return {
     read: () => healthy,
-    set: newValue => healthy = newValue,
+    set: (newValue) => (healthy = newValue),
   };
 };
 
@@ -37,15 +36,18 @@ const watchMockConfig = (filename, cb, onError) => {
       cb(config);
     } catch (e) {
       onError();
-      console.error('Unable to load the mocks.');
+      console.error("Unable to load the mocks.");
       console.error(e);
     }
   };
   loadFresh();
-  fs.watch(filename, { recursive: true }, loadFresh);
+  // TODO: this could be improved in the future, but as of now it works only on mac and windows
+  if (["win32", "darwin"].includes(process.platform)) {
+    fs.watch(filename, { recursive: true }, loadFresh);
+  }
 };
 
-const prepareRequestForMatching = req => ({
+const prepareRequestForMatching = (req) => ({
   path: req.path,
   method: req.method,
   query: req.query,
@@ -54,19 +56,20 @@ const prepareRequestForMatching = req => ({
 });
 
 // TODO: a test for that
-const buildPatternBasedRequestMatcher = pattern => {
+const buildPatternBasedRequestMatcher = (pattern) => {
   const siftMatcher = sift(pattern);
-  return req => siftMatcher(prepareRequestForMatching(req));
+  return (req) => siftMatcher(prepareRequestForMatching(req));
 };
 
-const buildUnifiedRequestMatcher = rawRequestMock => {
+const buildUnifiedRequestMatcher = (rawRequestMock) => {
   if (rawRequestMock.request && rawRequestMock.requestMatcher) {
     // Both a function and a pattern are provided.
     // TODO: a test for the priority and the fact of these matchers being combined.
     const patternBasedRequestMatcher = buildPatternBasedRequestMatcher(
       rawRequestMock.request
     );
-    return req => patternBasedRequestMatcher(req) && rawRequestMock.requestMatcher(req);
+    return (req) =>
+      patternBasedRequestMatcher(req) && rawRequestMock.requestMatcher(req);
   } else if (rawRequestMock.request && !rawRequestMock.requestMatcher) {
     // Just a pattern is provided.
     return buildPatternBasedRequestMatcher(rawRequestMock.request);
@@ -79,20 +82,20 @@ const buildUnifiedRequestMatcher = rawRequestMock => {
     return () => {
       // TODO: some sort of console log
       return false;
-    }
+    };
   }
 };
 
-const addErrorHandlingToRequestMatcher = requestMatcher => req => {
+const addErrorHandlingToRequestMatcher = (requestMatcher) => (req) => {
   try {
     return requestMatcher(req);
   } catch (e) {
-    console.warn('A request matcher threw an error.', e);
+    console.warn("A request matcher threw an error.", e);
     return false;
   }
 };
 
-const buildPatternbasedResponseGenerator = pattern => (req, res) => {
+const buildPatternbasedResponseGenerator = (pattern) => (req, res) => {
   if (pattern.status) res.status(pattern.status);
   if (pattern.headers) res.set(pattern.headers);
   if (pattern.json) res.json(pattern.json);
@@ -103,19 +106,19 @@ const buildPatternbasedResponseGenerator = pattern => (req, res) => {
 const getOrBuildResponseGenerator = ({ responseGenerator, response }) => {
   if (responseGenerator) return responseGenerator;
   if (response) return buildPatternbasedResponseGenerator(response);
-  return (req, res) => res.status(400).send('Missing response generator.'); // TODO: test this
+  return (req, res) => res.status(400).send("Missing response generator."); // TODO: test this
 };
 
 // Reduces mocks like
 // {requestPattern, requestMatcher, responseGenerator, response, ...}
 // to a unified format like {requestMatcher, responseGenerator, ...}
-const unifyMockConfig = rawConfig => {
-  return rawConfig.map(rawRequestMock => {
+const unifyMockConfig = (rawConfig) => {
+  return rawConfig.map((rawRequestMock) => {
     const requestMatcher = addErrorHandlingToRequestMatcher(
       buildUnifiedRequestMatcher(rawRequestMock)
     );
     const responseGenerator = getOrBuildResponseGenerator(rawRequestMock);
-    const pathPrefix = rawRequestMock.pathPrefix || '';
+    const pathPrefix = rawRequestMock.pathPrefix || "";
 
     return {
       ...rawRequestMock,
@@ -126,7 +129,7 @@ const unifyMockConfig = rawConfig => {
   });
 };
 
-const mockMatches = (session, req) => mock => {
+const mockMatches = (session, req) => (mock) => {
   if (mock.scenario) {
     const currentStep = getScenarioStep(session, mock.scenario);
     const requiredStep = mock.step;
@@ -137,9 +140,12 @@ const mockMatches = (session, req) => mock => {
 };
 
 const unmatchedRequestMiddleware = (req, res) => {
-  console.warn('No matching mock found for the following request:', prepareRequestForMatching(req));
-  return res.status(404).send('No matching mock. 😭');
-}
+  console.warn(
+    "No matching mock found for the following request:",
+    prepareRequestForMatching(req)
+  );
+  return res.status(404).send("No matching mock. 😭");
+};
 
 module.exports = {
   watchMockConfig,
