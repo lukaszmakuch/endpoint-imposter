@@ -139,19 +139,10 @@ const mockMatches = (session, req) => (mock) => {
   return mock.requestMatcher(req);
 };
 
-const unmatchedRequestMiddleware = (req, res) => {
-  console.warn(
-    "No matching mock found for the following request:",
-    prepareRequestForMatching(req)
-  );
-  return res.status(404).send("No matching mock. 😭");
-};
-
 module.exports = {
   watchMockConfig,
   unifyMockConfig,
   mockMatches,
   prepareRequestForMatching,
   makeMocksHealthService,
-  unmatchedRequestMiddleware,
 };

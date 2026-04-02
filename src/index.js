@@ -7,13 +7,15 @@ const fs = require('fs');
 
 const { makeSessions, getTransitionCount, transition } = require('./sessions');
 const makeAdminApp = require('./admin');
-const { watchMockConfig, unifyMockConfig, mockMatches, prepareRequestForMatching, makeMocksHealthService, unmatchedRequestMiddleware } = require('./mocks');
+const { watchMockConfig, unifyMockConfig, mockMatches, prepareRequestForMatching, makeMocksHealthService } = require('./mocks');
+const { makeUnmatchedRequestMiddleware } = require('./unmatchedRequestMiddleware');
 
 const argv = minimist(process.argv.slice(2));
 
 const mocksPath = path.resolve(argv.mocks);
 const port = argv.port;
 const httpsPort = argv['https-port'];
+const unmatchedMocksLogPath = argv['unmatchedMocksLogPath'];
 
 const keyPath = argv['https-key'] ? path.resolve(argv['https-key']) : path.resolve(__dirname, 'server.key');
 const certPath = argv['https-cert'] ? path.resolve(argv['https-cert']) : path.resolve(__dirname, 'server.cert');
@@ -22,6 +24,8 @@ const httpsOptions = {
   key: fs.readFileSync(keyPath),
   cert: fs.readFileSync(certPath)
 };
+
+const unmatchedRequestMiddleware = makeUnmatchedRequestMiddleware(unmatchedMocksLogPath);
 
 const sessions = makeSessions();
 
