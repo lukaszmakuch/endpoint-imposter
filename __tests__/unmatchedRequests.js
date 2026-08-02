@@ -4,7 +4,7 @@ const tmp = require("tmp");
 const { withServer, resolveMockDir } = require("../testUtils/server");
 
 it("logs deduplicated unmatched requests per session", () => {
-  const unmatchedMocksLogPath = tmp.dirSync().name;
+  const unmatchedMocksLogPath = tmp.dirSync({ unsafeCleanup: true }).name;
   console.log("unmatchedMocksLogPath", unmatchedMocksLogPath);
 
   return withServer(
@@ -27,31 +27,33 @@ it("logs deduplicated unmatched requests per session", () => {
       ).toMatchInlineSnapshot(`
         "[
           {
-            \\"path\\": \\"/aaa\\",
-            \\"method\\": \\"GET\\",
-            \\"query\\": {},
-            \\"headers\\": {
-              \\"accept\\": \\"application/json, text/plain, */*\\",
-              \\"user-agent\\": \\"axios/0.19.2\\",
-              \\"host\\": \\"localhost:3000\\",
-              \\"connection\\": \\"keep-alive\\"
+            "path": "/aaa",
+            "method": "GET",
+            "query": {},
+            "headers": {
+              "accept": "application/json, text/plain, */*",
+              "user-agent": "axios/1.19.0",
+              "accept-encoding": "gzip, compress, deflate, br",
+              "host": "127.0.0.1:3000",
+              "connection": "keep-alive"
             },
-            \\"body\\": {}
+            "body": {}
           },
           {
-            \\"path\\": \\"/bbb\\",
-            \\"method\\": \\"POST\\",
-            \\"query\\": {},
-            \\"headers\\": {
-              \\"accept\\": \\"application/json, text/plain, */*\\",
-              \\"content-type\\": \\"application/json;charset=utf-8\\",
-              \\"user-agent\\": \\"axios/0.19.2\\",
-              \\"content-length\\": \\"15\\",
-              \\"host\\": \\"localhost:3000\\",
-              \\"connection\\": \\"keep-alive\\"
+            "path": "/bbb",
+            "method": "POST",
+            "query": {},
+            "headers": {
+              "accept": "application/json, text/plain, */*",
+              "content-type": "application/json",
+              "user-agent": "axios/1.19.0",
+              "content-length": "15",
+              "accept-encoding": "gzip, compress, deflate, br",
+              "host": "127.0.0.1:3000",
+              "connection": "keep-alive"
             },
-            \\"body\\": {
-              \\"key\\": \\"value\\"
+            "body": {
+              "key": "value"
             }
           }
         ]"

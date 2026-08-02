@@ -11,6 +11,7 @@ it("spins up an HTTPS server with a self signed certificate", () =>
     },
     async () => {
       const res = await axios.get("https://localhost:3001/s/ping", {
+        family: 4,
         httpsAgent: new https.Agent({
           rejectUnauthorized: false,
         }),
@@ -29,6 +30,7 @@ it("spins up an HTTPS server with the provided certificate", () =>
     },
     async () => {
       const res = await axios.get("https://localhost:3001/s/ping", {
+        family: 4,
         withCredentials: false,
       });
       expect(res.data).toEqual("🔏");

@@ -11,7 +11,7 @@ const resolveMockDir = dirname => path.resolve(__dirname, '../testUtils/mocks', 
 const startServer = async (rawOptions) => {
 
   // copy the template mocks file to a temporary file
-  const mockDir = tmp.dirSync();
+  const mockDir = tmp.dirSync({ unsafeCleanup: true });
   let options;
   let setMocksDir = () => {};
   if (rawOptions['--mocks']) {
@@ -56,7 +56,9 @@ const startServer = async (rawOptions) => {
   }));
 
   const rawClient = axios.create({
-    baseURL: `http://localhost:${options['--port']}/`,
+    // Prefer IPv4: axios 1.x resolves "localhost" to ::1 on some Node versions,
+    // while the mock server listens on IPv4 by default.
+    baseURL: `http://127.0.0.1:${options['--port']}/`,
     validateStatus: null,
   });
 
