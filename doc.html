@@ -230,7 +230,7 @@ http://localhost:3000/admin/terminate?session=abc
 http://localhost:3000/admin/terminate?session=xyz
 ```
 
-Matching requests
+Request matching
 ---------------
 
 ### Using patterns
@@ -290,6 +290,59 @@ These patterns behave in the same way.
 ```
 
 The difference is that the former one enables performance optimizations.
+
+### Unmatched requests
+
+When a request doesn't match any mock, Endpoint Imposter by default prints a warning to the console with the request details.
+
+Sometimes a console warning isn't enough. You may want to keep unmatched requests around and process them later.
+
+Pass `--unmatchedMocksLogPath` and Endpoint Imposter will write them to JSON files:
+
+```none
+$ npx endpoint-imposter --port 3000 --mocks ~/Desktop/my-mocks.js --unmatchedMocksLogPath ~/Desktop/unmatched-mocks
+```
+
+Each [session](#-sessions) gets its own file named after the session identifier. For example:
+
+```none
+~/Desktop/unmatched-mocks/my-session.json
+```
+
+So if the application under test hits something like `http://localhost:3000/my-session/my-mocked-endpoint` and nothing matches, that request ends up in `my-session.json`.
+
+Requests are deduplicated per session, so the same unmatched request is only logged once.
+
+The file looks like this:
+
+```js
+[
+  {
+    "path": "/aaa",
+    "method": "GET",
+    "query": {},
+    "headers": {
+      "accept": "application/json, text/plain, */*",
+      "host": "localhost:3000"
+    },
+    "body": {}
+  },
+  {
+    "path": "/bbb",
+    "method": "POST",
+    "query": {},
+    "headers": {
+      "content-type": "application/json;charset=utf-8",
+      "host": "localhost:3000"
+    },
+    "body": {
+      "key": "value"
+    }
+  }
+]
+```
+
+Matched requests are never written to this log.
 
 Generating responses
 ---------------
